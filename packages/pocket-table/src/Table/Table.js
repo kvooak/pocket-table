@@ -52,13 +52,9 @@ const CustomRow = styled.div`
 const CustomCell = styled.div`
   position: relative;
   background: white;
-  border-left: 1px solid rgba(55, 53, 47, 0);
-  border-right: 1px solid rgba(55, 53, 47, 0);
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
   margin: 0;
   padding: 0.5rem;
-  height: 100%;
-  width: 100%;
 `;
 
 const Resizer = styled.div`
@@ -73,6 +69,7 @@ const Resizer = styled.div`
   z-index: 1;
   ${'' /* prevents from scrolling while dragging on touch devices */}
   touch-action:none;
+  transition: all 0.1s;
   &.resizing {
     width: 8px;
   }
