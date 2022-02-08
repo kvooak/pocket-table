@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useBlockLayout, useResizeColumns, useTable } from 'react-table';
 import styled from '@emotion/styled';
-import { Link } from 'react-router-dom';
 
 const CustomTable = styled.div`
   display: table;
@@ -32,9 +32,9 @@ const CustomHeader = styled.div`
   margin: 0;
   padding: 0.5rem;
   &.hover {
-    transition: 100ms;
+    transition: all 0.1s;
     margin-top: -1px;
-    background: rgba(55, 53, 47, 0.08);
+    background: rgba(55, 53, 47, 0.04);
   }
 `;
 const CustomRow = styled.div`
@@ -42,9 +42,8 @@ const CustomRow = styled.div`
   flex: 1 1;
   &.hover {
     .cell {
-      margin-top: -1px;
-      border-bottom: 1px solid rgba(55, 53, 47, 0.6);
-      border-top: 1px solid rgba(55, 53, 47, 0.6);
+      background: rgba(55, 53, 47, 0.04);
+      transition: all 0.1s;
     }
   }
 `;
@@ -98,59 +97,93 @@ const Header = ({ column, ...props }) => {
   );
 };
 
-const LinkWrapper = ({ path, children }) => {
-  const style = {
-    textDecoration: 'none',
-    color: 'inherit',
-    display: 'inline-block',
-  };
-  // if (path)
-  //   return (
-  //     <Link to={path} style={style}>
-  //       {children}
-  //     </Link>
-  //   );
-  return <>{children}</>;
-};
-
 const Cell = ({ cell, ...props }) => {
   const content = cell.render('Cell');
   return (
-    <LinkWrapper path={props.path}>
-      <CustomCell className="cell" {...props}>
-        {content}
-      </CustomCell>
-    </LinkWrapper>
+    <CustomCell className="cell" {...props}>
+      {content}
+    </CustomCell>
   );
 };
 
-const Row = ({ row, ...props }) => {
-  const { _id: path } = row.original;
+const Cells = ({
+  cells,
+  cellEventHandlers,
+  onCellEventsFallback,
+  prioritizeCellHandlers,
+}) => {
+  const addHandlers = () => {
+    const handlerMapper = (cell) => {
+      let eventHandler = {};
+      const defaultEventHandler = cellEventHandlers[cell.column.id];
+      if (defaultEventHandler) {
+        eventHandler = defaultEventHandler;
+      } else {
+        // enable row event handler via onCellEvents() callback
+        // if cell handler is prioritized but no handler
+        // is provided by user
+        if (prioritizeCellHandlers) {
+          // TODO: pass row data instead of cell data when this
+          //       callback is called.
+          eventHandler = onCellEventsFallback;
+        }
+      }
+      const cellProps = {
+        ...cell.getCellProps(),
+        ...eventHandler,
+      };
+      return <Cell className="cell" {...cellProps} cell={cell} />;
+    };
+    return cells.map(handlerMapper);
+  };
+  const cellsWithHandlers = addHandlers();
+  return cellsWithHandlers;
+};
+
+const Row = ({
+  row,
+  rowEventHandlers,
+  cellEventHandlers,
+  prioritizeCellHandlers,
+  ...props
+}) => {
   const [hovered, setHovered] = useState(false);
   const handleMouseMove = () => {
     setHovered(!hovered);
   };
 
+  const priorityCheckedRowEventHandlers = useMemo(() => {
+    if (prioritizeCellHandlers) return {};
+    return rowEventHandlers;
+  }, [prioritizeCellHandlers, rowEventHandlers]);
+
   return (
     <CustomRow
       {...props}
+      {...priorityCheckedRowEventHandlers}
       className={`${hovered ? 'hover' : ''}`}
       onMouseEnter={handleMouseMove}
       onMouseLeave={handleMouseMove}
     >
-      {row.cells.map((cell) => (
-        <Cell
-          className={`cell ${hovered ? 'row-hover' : ''}`}
-          {...cell.getCellProps()}
-          cell={cell}
-          path={path}
-        />
-      ))}
+      <Cells
+        cells={row.cells}
+        // TODO: pass row data instead of cell data when this
+        //       callback is called.
+        onCellEventsFallback={rowEventHandlers}
+        cellEventHandlers={cellEventHandlers}
+        prioritizeCellHandlers={prioritizeCellHandlers}
+      />
     </CustomRow>
   );
 };
 
-export default function Table({ columns, data }) {
+export default function Table({
+  columns,
+  data,
+  rowEventHandlers,
+  cellEventHandlers,
+  prioritizeCellHandlers,
+}) {
   const defaultColumn = useMemo(
     () => ({
       minWidth: 40,
@@ -188,9 +221,29 @@ export default function Table({ columns, data }) {
       <CustomTableRowGroup {...tableBodyProps}>
         {rows.map((row) => {
           prepareRow(row);
-          return <Row {...row.getRowProps()} row={row} />;
+          return (
+            <Row
+              {...row.getRowProps()}
+              rowEventHandlers={rowEventHandlers}
+              cellEventHandlers={cellEventHandlers}
+              prioritizeCellHandlers={prioritizeCellHandlers}
+              row={row}
+            />
+          );
         })}
       </CustomTableRowGroup>
     </CustomTable>
   );
 }
+
+Table.defaultProps = {
+  rowEventHandlers: {},
+  cellEventHandlers: {},
+  prioritizeCellHandlers: true,
+};
+
+Table.propTypes = {
+  rowEventHandlers: PropTypes.instanceOf(Object),
+  cellEventHandlers: PropTypes.instanceOf(Object),
+  prioritizeCellHandlers: PropTypes.bool,
+};

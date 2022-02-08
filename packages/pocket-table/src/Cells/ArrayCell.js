@@ -6,10 +6,10 @@ export default function ArrayCell({ cell }) {
   const { row } = cell;
   const values = useMemo(
     () =>
-      cell.value.map((value) => (
+      cell.value.map((value, index) => (
         <>
-          <BaseTag key={`${row.id}-${value}-base1`} value={value} />
-          <AvatarTag key={`${row.id}-${value}-avatar`} value={value} />
+          <BaseTag key={`${row.id} ${index}`} value={value} />
+          <AvatarTag key={`${row.id}`} value={value} />
         </>
       )),
     [cell],
