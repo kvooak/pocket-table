@@ -16,10 +16,37 @@ const COLUMNS = [
 export default function App() {
   const data = users;
   const table = { columns: COLUMNS, data };
+  const handleOnRowClick = (args) => {
+    // console.log(args)
+    console.log('test on row click');
+  };
+
+  const handleOnCellClick = () => {
+    console.log('test on cell click');
+  };
+
+  const rowEventHandlers = {
+    onClick: (...args) => handleOnRowClick(args),
+  };
+
+  const cellEventHandlers = {
+    name: {
+      onClick: () => handleOnCellClick(),
+    },
+    email: {
+      onClick: () => handleOnCellClick(),
+    }
+  }
+
   return (
     <>
       <h1>Pocket Table</h1>
-      <Table {...table} />
+      <Table
+        {...table}
+        rowEventHandlers={rowEventHandlers}
+        cellEventHandlers={cellEventHandlers}
+        prioritizeCellHandlers={true} // default true
+      />
     </>
   );
 }
