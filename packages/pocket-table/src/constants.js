@@ -1,5 +1,5 @@
 const CONSTANTS = {
-  NEUTRAL_BACKGROUND: 'gainsboro',
+  NEUTRAL_BACKGROUND: 'slate',
   NEUTRAL_COLOR: 'inherit',
 };
 

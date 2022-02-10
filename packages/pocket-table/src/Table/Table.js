@@ -52,8 +52,6 @@ const CustomCell = styled.div`
   position: relative;
   background: white;
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-  margin: 0;
-  padding: 0.5rem;
 `;
 
 const Resizer = styled.div`
@@ -145,25 +143,48 @@ const Row = ({
   rowEventHandlers,
   cellEventHandlers,
   prioritizeCellHandlers,
+  highlightRowOnHover,
   ...props
 }) => {
   const [hovered, setHovered] = useState(false);
-  const handleMouseMove = () => {
-    setHovered(!hovered);
-  };
 
-  const priorityCheckedRowEventHandlers = useMemo(() => {
+  const prioritizedRowEventHandlers = useMemo(() => {
     if (prioritizeCellHandlers) return {};
     return rowEventHandlers;
   }, [prioritizeCellHandlers, rowEventHandlers]);
 
+  const {
+    onClick,
+    onMouseEnter,
+    onMouseLeave,
+    onMouseDown,
+    onMouseUp,
+    onFocus,
+    onBlur,
+  } = prioritizedRowEventHandlers;
+
+
+  const handleMouseEnter = (...args) => {
+    if (highlightRowOnHover) setHovered((prev) => !prev);
+    onMouseEnter(...args);
+  }
+
+  const handleMouseLeave = (...args) => {
+    if (highlightRowOnHover) setHovered((prev) => !prev);
+    onMouseLeave(...args);
+  }
+
   return (
     <CustomRow
       {...props}
-      {...priorityCheckedRowEventHandlers}
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onFocus={onFocus}
+      onBlur={onBlur}
       className={`${hovered ? 'hover' : ''}`}
-      onMouseEnter={handleMouseMove}
-      onMouseLeave={handleMouseMove}
     >
       <Cells
         cells={row.cells}
@@ -183,6 +204,7 @@ export default function Table({
   rowEventHandlers,
   cellEventHandlers,
   prioritizeCellHandlers,
+  highlightRowOnHover,
 }) {
   const defaultColumn = useMemo(
     () => ({
@@ -227,6 +249,7 @@ export default function Table({
               rowEventHandlers={rowEventHandlers}
               cellEventHandlers={cellEventHandlers}
               prioritizeCellHandlers={prioritizeCellHandlers}
+              highlightRowOnHover={highlightRowOnHover}
               row={row}
             />
           );
@@ -240,10 +263,12 @@ Table.defaultProps = {
   rowEventHandlers: {},
   cellEventHandlers: {},
   prioritizeCellHandlers: true,
+  highlightRowOnHover: true,
 };
 
 Table.propTypes = {
   rowEventHandlers: PropTypes.instanceOf(Object),
   cellEventHandlers: PropTypes.instanceOf(Object),
   prioritizeCellHandlers: PropTypes.bool,
+  highlightRowOnHover: PropTypes.bool,
 };

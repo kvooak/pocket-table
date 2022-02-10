@@ -8,8 +8,7 @@ export default function ArrayCell({ cell }) {
     () =>
       cell.value.map((value, index) => (
         <>
-          <BaseTag key={`${row.id} ${index}`} value={value} />
-          <AvatarTag key={`${row.id}`} value={value} />
+          <BaseTag key={`${row.id}`} value={value} />
         </>
       )),
     [cell],
