@@ -5,13 +5,13 @@ import ArrayMenu from './Cells/ArrayCell/ArrayMenu';
 // use as anchor for cell menu
 const MenuAnchor = styled.div`
   display: inline-block;
-  background: pink;
   width: 100%;
   height: 100%;
 `;
 
-const CellWithMenu = ({ callback, cell, type }) => {
+const CellWithMenu = ({ callback, cell, type, onMenuEvent }) => {
   const { key } = cell.getCellProps();
+  const { value } = cell;
   const [anchorEl, setAnchorEl] = useState(null);
   const handleShowMenu = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -19,7 +19,14 @@ const CellWithMenu = ({ callback, cell, type }) => {
 
   const Menu = useMemo(() => {
     if (type === 'array')
-      return <ArrayMenu anchorEl={anchorEl} cellKey={key} />;
+      return (
+        <ArrayMenu
+          anchorEl={anchorEl}
+          cellKey={key}
+          cellValue={value}
+          onMenuEvent={onMenuEvent}
+        />
+      );
     return null;
   }, [type, anchorEl]);
 
@@ -56,12 +63,17 @@ export const mapColumnsToReactTable = (columns) => {
     }
     // has both Cell and extra, ignore type,
     // use anchor wrapper for cell menu
-    const { type, hasMenu } = custom;
+    const { type, hasMenu, menuEventHandlers } = custom;
     if (!hasMenu) return col;
     return {
       ...col,
       Cell: ({ cell }) => (
-        <CellWithMenu callback={Cell} cell={cell} type={type} />
+        <CellWithMenu
+          callback={Cell}
+          cell={cell}
+          type={type}
+          onMenuEvent={menuEventHandlers}
+        />
       ),
     };
   };

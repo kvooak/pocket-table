@@ -18,8 +18,9 @@ const COLUMNS = [
       // TODO: throw error if wrong type is provided
       //       ignore if Cell is provided & hasMenu isn't
       //       type is required if hasMenu: true
-      type: 'array', 
+      type: 'array',
       hasMenu: true, // TODO: default true, hook Menu to a Cell wrapper if Cell is provided
+      menuEventHandlers: {}, // TODO: onChange.
     },
   },
 ];
@@ -30,22 +31,21 @@ export default function App() {
     () => mapColumnsToReactTable(COLUMNS),
     [mapColumnsToReactTable],
   );
-  //console.log(CONVERTED_COLUMNS)
   const table = { columns: CONVERTED_COLUMNS, data };
 
   const handleOnRowClick = (args) => {
-    console.log(args);
-    // console.log('test on row click');
+    // console.log(args);
+    console.log('test on row click');
   };
 
   const handleOnRowMouseEnter = (args) => {
     console.log(args);
-    // console.log('test on row mouse enter');
+    console.log('test on row mouse enter');
   };
 
   const handleOnRowMouseLeave = (args) => {
-    // console.log(args);
-    // console.log('test on row mouse leave');
+    console.log(args);
+    console.log('test on row mouse leave');
   };
 
   const handleOnCellClick = () => {
@@ -78,7 +78,7 @@ export default function App() {
         {...table}
         rowEventHandlers={rowEventHandlers}
         cellEventHandlers={cellEventHandlers}
-        prioritizeCellHandlers={false} // default true
+        prioritizeCellHandlers={true} // default true
         highlightRowOnHover={true} // default true
       />
     </>
