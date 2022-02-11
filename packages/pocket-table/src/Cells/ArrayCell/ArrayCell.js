@@ -6,7 +6,7 @@ export default function ArrayCell({ cell }) {
   const { row } = cell;
   const values = useMemo(
     () =>
-      cell.value.map((value, index) => (
+      cell.value.map((value) => (
         <>
           <BaseTag key={`${row.id}`} value={value} />
         </>

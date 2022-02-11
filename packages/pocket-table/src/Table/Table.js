@@ -166,12 +166,12 @@ const Row = ({
 
   const handleMouseEnter = (...args) => {
     if (highlightRowOnHover) setHovered((prev) => !prev);
-    onMouseEnter(...args);
+    onMouseEnter && onMouseEnter(...args);
   }
 
   const handleMouseLeave = (...args) => {
     if (highlightRowOnHover) setHovered((prev) => !prev);
-    onMouseLeave(...args);
+    onMouseLeave && onMouseLeave(...args);
   }
 
   return (
