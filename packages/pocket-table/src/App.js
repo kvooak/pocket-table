@@ -39,13 +39,13 @@ export default function App() {
   };
 
   const handleOnRowMouseEnter = (args) => {
-    console.log(args);
-    console.log('test on row mouse enter');
+    // console.log(args);
+    // console.log('test on row mouse enter');
   };
 
   const handleOnRowMouseLeave = (args) => {
-    console.log(args);
-    console.log('test on row mouse leave');
+    // console.log(args);
+    // console.log('test on row mouse leave');
   };
 
   const handleOnCellClick = () => {
