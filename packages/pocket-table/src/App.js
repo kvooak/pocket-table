@@ -50,7 +50,6 @@ export default function App() {
               newValue,
               oldValue,
             }) => {
-              console.log({ dataKey, action, value, index, newValue, oldValue });
               setData((prev) => {
                 const next = [...prev];
                 next[rowIndex][dataKey] = newValue;
@@ -60,7 +59,7 @@ export default function App() {
           },
         },
       }),
-    [createColumns, setData],
+    [],
   );
 
   const table = useMemo(() => ({ columns, data }), [columns, data]);

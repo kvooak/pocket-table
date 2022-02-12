@@ -1,6 +1,6 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
-import { useMemo, useState } from 'react';
 import ArrayMenu from './Cells/ArrayCell/ArrayMenu';
 
 // use as anchor for cell menu
@@ -10,39 +10,52 @@ const MenuAnchor = styled.div`
   height: 100%;
 `;
 
-const CellWithMenu = ({ callback, cell, type, menuOptions, onMenuEvent }) => {
-  const { key } = cell.getCellProps();
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleShowMenu = (event) => {
-    setAnchorEl(anchorEl ? null : event.currentTarget);
-  };
-
-  const Menu = useMemo(() => {
+const CellMenu = React.memo(
+  ({ cell, type, options, anchorEl, onClose, onMenuEvent }) => {
     if (type === 'array')
       return (
         <ArrayMenu
           cell={cell}
-          options={menuOptions}
+          options={options}
           anchorEl={anchorEl}
+          onClose={onClose}
           onMenuEvent={onMenuEvent}
         />
       );
     return null;
-  }, [cell, menuOptions, type, anchorEl]);
+  },
+);
 
-  return (
-    <>
-      <MenuAnchor
-        id={`menu-anchor-${key}`}
-        className="menu-anchor"
-        onClick={handleShowMenu}
-      >
-        {callback({ cell })}
-      </MenuAnchor>
-      {Menu}
-    </>
-  );
-};
+const CellWithMenu = React.memo(
+  ({ callback, cell, type, menuOptions, onMenuEvent }) => {
+    const { key } = cell.getCellProps();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const handleShowMenu = (event) => {
+      setAnchorEl(anchorEl ? null : event.currentTarget);
+    };
+
+    return (
+      <>
+        <MenuAnchor
+          id={`menu-anchor-${key}`}
+          className="menu-anchor"
+          onClick={handleShowMenu}
+        >
+          {callback({ cell })}
+        </MenuAnchor>
+
+        <CellMenu
+          cell={cell}
+          type={type}
+          options={menuOptions}
+          anchorEl={anchorEl}
+          onClose={handleShowMenu}
+          onMenuEvent={onMenuEvent}
+        />
+      </>
+    );
+  },
+);
 
 CellWithMenu.defaultProps = {
   menuOptions: [],
@@ -88,4 +101,21 @@ export const mapColumnsToReactTable = (columns) => {
   };
 
   return columns.map(reactTableColMapper);
+};
+
+export const useKeyPress = (element = window) => {
+  const [key, setKey] = useState(null);
+  const eventHandler = (event) => {
+    setKey(event.key);
+  };
+
+  useEffect(() => {
+    element.addEventListener('keydown', eventHandler);
+    return () => {
+      element.removeEventListener('keydown', eventHandler);
+      setKey(null);
+    };
+  }, [key]);
+
+  return key;
 };
