@@ -1,37 +1,69 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import ArrayCell from './Cells/ArrayCell/ArrayCell';
 import users from './data/users';
 import Table from './Table/Table';
 import { mapColumnsToReactTable } from './utils';
 
-const COLUMNS = [
-  { Header: 'Name', accessor: 'name' },
-  { Header: 'Email', accessor: 'email' },
-  { Header: 'Organization', accessor: 'organization' },
-  {
-    Header: 'Status',
-    accessor: 'status',
-    //Cell: ({ cell }) => <div>{cell.toString()}</div>,
-    Cell: ({ cell }) => <ArrayCell cell={cell} />,
-    // ignore custom if Cell is provided by user
-    custom: {
-      // TODO: throw error if wrong type is provided
-      //       ignore if Cell is provided & hasMenu isn't
-      //       type is required if hasMenu: true
-      type: 'array',
-      hasMenu: true, // TODO: default true, hook Menu to a Cell wrapper if Cell is provided
-      menuEventHandlers: {}, // TODO: onChange.
+const createColumns = ({ custom }) => {
+  const customColumns = [
+    { Header: 'Name', accessor: 'name' },
+    { Header: 'Email', accessor: 'email' },
+    { Header: 'Organization', accessor: 'organization' },
+    {
+      Header: 'Status',
+      accessor: 'status',
+      //Cell: ({ cell }) => <div>{cell.toString()}</div>,
+      Cell: ({ cell }) => <ArrayCell cell={cell} />,
+      // ignore custom if Cell is provided by user
+      custom,
     },
-  },
-];
+  ];
+  return mapColumnsToReactTable(customColumns);
+};
 
 export default function App() {
-  const data = users;
-  const CONVERTED_COLUMNS = useMemo(
-    () => mapColumnsToReactTable(COLUMNS),
-    [mapColumnsToReactTable],
+  const [data, setData] = useState(users);
+  const columns = useMemo(
+    () =>
+      createColumns({
+        custom: {
+          // TODO: throw error if wrong type is provided
+          //       ignore if Cell is provided & hasMenu isn't
+          //       type is required if hasMenu: true
+          type: 'array',
+          hasMenu: true, // TODO: default true, hook Menu to a Cell wrapper if Cell is provided
+          menuOptions: [
+            'admin',
+            'super',
+            'staff',
+            'creator',
+            'active',
+            'inactive',
+          ],
+          menuEventHandlers: {
+            onChange: ({
+              dataKey,
+              rowIndex,
+              action,
+              value,
+              index,
+              newValue,
+              oldValue,
+            }) => {
+              console.log({ dataKey, action, value, index, newValue, oldValue });
+              setData((prev) => {
+                const next = [...prev];
+                next[rowIndex][dataKey] = newValue;
+                return next;
+              });
+            },
+          },
+        },
+      }),
+    [createColumns, setData],
   );
-  const table = { columns: CONVERTED_COLUMNS, data };
+
+  const table = useMemo(() => ({ columns, data }), [columns, data]);
 
   const handleOnRowClick = (args) => {
     // console.log(args);

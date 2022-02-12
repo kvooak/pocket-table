@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import { useMemo, useState } from 'react';
 import ArrayMenu from './Cells/ArrayCell/ArrayMenu';
@@ -9,9 +10,8 @@ const MenuAnchor = styled.div`
   height: 100%;
 `;
 
-const CellWithMenu = ({ callback, cell, type, onMenuEvent }) => {
+const CellWithMenu = ({ callback, cell, type, menuOptions, onMenuEvent }) => {
   const { key } = cell.getCellProps();
-  const { value } = cell;
   const [anchorEl, setAnchorEl] = useState(null);
   const handleShowMenu = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
@@ -21,14 +21,14 @@ const CellWithMenu = ({ callback, cell, type, onMenuEvent }) => {
     if (type === 'array')
       return (
         <ArrayMenu
+          cell={cell}
+          options={menuOptions}
           anchorEl={anchorEl}
-          cellKey={key}
-          cellValue={value}
           onMenuEvent={onMenuEvent}
         />
       );
     return null;
-  }, [type, anchorEl]);
+  }, [cell, menuOptions, type, anchorEl]);
 
   return (
     <>
@@ -42,6 +42,14 @@ const CellWithMenu = ({ callback, cell, type, onMenuEvent }) => {
       {Menu}
     </>
   );
+};
+
+CellWithMenu.defaultProps = {
+  menuOptions: [],
+};
+
+CellWithMenu.propTypes = {
+  menuOptions: PropTypes.instanceOf(Array),
 };
 
 export const mapColumnsToReactTable = (columns) => {
@@ -63,7 +71,7 @@ export const mapColumnsToReactTable = (columns) => {
     }
     // has both Cell and extra, ignore type,
     // use anchor wrapper for cell menu
-    const { type, hasMenu, menuEventHandlers } = custom;
+    const { type, hasMenu, menuOptions, menuEventHandlers } = custom;
     if (!hasMenu) return col;
     return {
       ...col,
@@ -72,6 +80,7 @@ export const mapColumnsToReactTable = (columns) => {
           callback={Cell}
           cell={cell}
           type={type}
+          menuOptions={menuOptions}
           onMenuEvent={menuEventHandlers}
         />
       ),
