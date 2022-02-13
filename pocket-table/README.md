@@ -101,5 +101,6 @@ export default function App() {
       highlightRowOnHover={false} // default true
     />
   );
+`
 
 ```
