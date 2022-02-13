@@ -1,8 +1,19 @@
 {
   "name": "react-pocket-table",
-  "author": "Quang Hoang",
-  "version": "0.0.1-alpha.2",
+  "version": "0.0.1-alpha.6",
+  "description": "Flexible MUI Table built on react-table",
   "license": "MIT",
+  "author": {
+    "name": "Quang Hoang",
+    "email": "quang.hd@gmx.de",
+    "url": "https://github.com/kvooak"
+  },
+  "contributors": [
+    {
+      "name": "Thanh Hoang",
+      "url": "https://github.com/vodkavn"
+    }
+  ],
   "keywords": [
     "react",
     "table",
@@ -12,6 +23,12 @@
     "react-pocket-table",
     "datagrid"
   ],
+  "source": "src/index.js",
+  "main": "src/index.js",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
   "engines": {
     "node": ">=12"
   },
@@ -20,11 +37,12 @@
     "@emotion/babel-plugin": "^11.7.2",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.4.1",
     "@mui/material": "^5.4.0",
-    "@mui/icons-material": "^5.4.1"
-  },
-  "peerDependencies": {
-    "react": ">=16",
-    "react-dom": ">=16"
+    "@mui/system": "^5.4.1",
+    "parcel": "^2.3.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-table": "^7.7.0"
   }
 }
