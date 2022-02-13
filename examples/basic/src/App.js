@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ArrayCell, Table, mapColumnsToReactTable } from "react-pocket-table";
+import { ArrayCell, Table, mapColumnsToReactTable } from "react-pocket-table/src";
 import users from "./data/users";
 
 const createColumns = ({ custom }) => {

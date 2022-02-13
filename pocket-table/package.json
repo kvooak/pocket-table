@@ -1,0 +1,30 @@
+{
+  "name": "react-pocket-table",
+  "author": "Quang Hoang",
+  "version": "0.0.1-alpha.1",
+  "license": "MIT",
+  "keywords": [
+    "react",
+    "table",
+    "mui",
+    "material UI",
+    "pocket-table",
+    "react-pocket-table",
+    "datagrid"
+  ],
+  "engines": {
+    "node": ">=12"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.12",
+    "@emotion/babel-plugin": "^11.7.2",
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/material": "^5.4.0",
+    "@mui/icons-material": "^5.4.1"
+  },
+  "peerDependencies": {
+    "react": ">=16",
+    "react-dom": ">=16"
+  }
+}
