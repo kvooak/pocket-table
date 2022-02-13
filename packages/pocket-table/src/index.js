@@ -1,5 +1,3 @@
-import ReactDOM from 'react-dom';
-import App from './App';
-
-const app = document.getElementById('app');
-ReactDOM.render(<App />, app);
+export * as Table from "./Table/Table";
+export * as ArrayCell from "./Cells/ArrayCell/ArrayCell";
+export { mapColumnsToReactTable } from "./utils";
