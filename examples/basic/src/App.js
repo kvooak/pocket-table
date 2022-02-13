@@ -20,6 +20,7 @@ const createColumns = ({ custom }) => {
 };
 
 export default function App() {
+  console.log('test')
   const [data, setData] = useState(users);
   const columns = useMemo(
     () =>
