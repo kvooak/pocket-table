@@ -1,0 +1,55 @@
+{
+  "name": "react-pocket-table",
+  "version": "0.0.1-alpha.11",
+  "description": "Flexible MUI Table built on react-table",
+  "license": "MIT",
+  "author": "Quang Hoang <quang.hd@gmx.de>",
+  "contributors": [
+    "Thanh Hoang"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kvooak/pocket-table.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "react",
+    "table",
+    "mui",
+    "material UI",
+    "pocket-table",
+    "react-pocket-table",
+    "datagrid"
+  ],
+  "files": [
+    "src",
+    "dist"
+  ],
+  "source": "src/index.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "parcel watch",
+    "build": "parcel build"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "devDependencies": {
+    "parcel": "^2.3.1",
+    "@babel/core": "^7.17.2",
+    "@emotion/babel-plugin": "^11.7.2"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "prop-types": "^15.8.1",
+    "@mui/icons-material": "^5.4.1",
+    "@mui/material": "^5.4.0",
+    "@mui/system": "^5.4.1",
+    "react": ">=16.8",
+    "react-dom": ">=16.8",
+    "react-table": "^7.7.0"
+  }
+}
