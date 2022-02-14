@@ -67,6 +67,7 @@ const CellValueInput = ({ onKeyDown, ...props }) => {
   const ref = useRef();
   const keyPress = useKeyPress(ref.current);
   const [input, setInput] = useState(null);
+  // TODO: add shortcut Enter for creating new Item
   useEffect(() => {
     if (keyPress) {
       const isDelete = !input && keyPress === 'Backspace';
