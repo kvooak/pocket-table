@@ -1,17 +1,15 @@
-import { useState, useMemo } from 'react';
-import ArrayCell from './Cells/ArrayCell/ArrayCell';
-import users from './data/users';
-import Table from './Table/Table';
-import { mapColumnsToReactTable } from './utils';
+import { useState, useMemo } from "react";
+import { ArrayCell, Table, mapColumnsToReactTable } from "react-pocket-table";
+import users from "./data/users";
 
 const createColumns = ({ custom }) => {
   const customColumns = [
-    { Header: 'Name', accessor: 'name' },
-    { Header: 'Email', accessor: 'email' },
-    { Header: 'Organization', accessor: 'organization' },
+    { Header: "Name", accessor: "name" },
+    { Header: "Email", accessor: "email" },
+    { Header: "Organization", accessor: "organization" },
     {
-      Header: 'Status',
-      accessor: 'status',
+      Header: "Status",
+      accessor: "status",
       //Cell: ({ cell }) => <div>{cell.toString()}</div>,
       Cell: ({ cell }) => <ArrayCell cell={cell} />,
       // ignore custom if Cell is provided by user
@@ -22,6 +20,7 @@ const createColumns = ({ custom }) => {
 };
 
 export default function App() {
+  console.log('test')
   const [data, setData] = useState(users);
   const columns = useMemo(
     () =>
@@ -30,15 +29,15 @@ export default function App() {
           // TODO: throw error if wrong type is provided
           //       ignore if Cell is provided & hasMenu isn't
           //       type is required if hasMenu: true
-          type: 'array',
+          type: "array",
           hasMenu: true, // TODO: default true, hook Menu to a Cell wrapper if Cell is provided
           menuOptions: [
-            'admin',
-            'super',
-            'staff',
-            'creator',
-            'active',
-            'inactive',
+            "admin",
+            "super",
+            "staff",
+            "creator",
+            "active",
+            "inactive",
           ],
           menuEventHandlers: {
             onChange: ({
@@ -59,14 +58,14 @@ export default function App() {
           },
         },
       }),
-    [],
+    []
   );
 
   const table = useMemo(() => ({ columns, data }), [columns, data]);
 
   const handleOnRowClick = (args) => {
     // console.log(args);
-    console.log('test on row click');
+    console.log("test on row click");
   };
 
   const handleOnRowMouseEnter = (args) => {
@@ -80,7 +79,7 @@ export default function App() {
   };
 
   const handleOnCellClick = () => {
-    console.log('test on cell click');
+    console.log("test on cell click");
   };
 
   const rowEventHandlers = {
