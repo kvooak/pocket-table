@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import muiPaper from '@mui/material/Paper';
@@ -70,14 +64,19 @@ const CellValueInput = ({ onKeyDown, ...props }) => {
   // TODO: add shortcut Enter for creating new Item
   useEffect(() => {
     if (keyPress) {
-      const isDelete = !input && keyPress === 'Backspace';
-      onKeyDown({ isDelete });
+      let action;
+      if (!input && keyPress === 'Backspace') {
+        action = 'delete';
+      } else if (keyPress === 'Enter') {
+        action = 'add';
+      }
+      onKeyDown({ action, input });
     }
   }, [keyPress, input]);
 
   const handleKeyDown = (event) => {
     setInput(event.target.value);
-    onKeyDown({ search: event.target.value });
+    onKeyDown({ input: event.target.value });
   };
 
   return <StyledInput ref={ref} {...props} onInput={handleKeyDown} />;
@@ -160,25 +159,41 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
   };
 
   const optionComponents = useMemo(() => {
-    if (!options.length && searchKey) {
-      return (
-        <OptionItem isNew value={searchKey} onChange={handleCellValueChange} />
+    const components = [];
+    if (options.length !== 1 && searchKey) {
+      const createNew = (
+        <OptionItem
+          isNew
+          key={`create-${searchKey}`}
+          value={searchKey}
+          onChange={handleCellValueChange}
+        />
       );
+      components.push(createNew);
     }
-    const remainingOptions = options.filter(
-      (option) => !cellValue.includes(option),
-    );
-    return remainingOptions.map((value, index) => (
-      <OptionItem
-        key={value}
-        value={value}
-        index={index}
-        onChange={handleCellValueChange}
-      />
-    ));
+    const selectFromList = options
+      .filter((option) => !cellValue.includes(option))
+      .map((value, index) => (
+        <OptionItem
+          key={value}
+          value={value}
+          index={index}
+          onChange={handleCellValueChange}
+        />
+      ));
+    components.push(...selectFromList);
+    return components;
   }, [searchKey, options, cellValue]);
 
   return optionComponents;
+};
+
+Option.defaultProps = {
+  options: [],
+};
+
+Option.propTypes = {
+  options: PropTypes.instanceOf(Array),
 };
 
 const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
@@ -206,19 +221,28 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
     return searchResult;
   }, [searchKey]);
 
-  const handleInputChange = ({ isDelete, search }) => {
-    if (isDelete) {
+  const handleInputChange = ({ action, input }) => {
+    let event;
+    setSearchKey(input);
+    if (action === 'delete') {
       const deleteIndex = value.length - 1;
-      const event = {
-        action: 'delete',
+      event = {
+        action,
         value: value[deleteIndex],
         index: deleteIndex,
         newValue: value.slice(0, -1),
         oldValue: value,
       };
-      handleValueChange(event);
+    } else if (action === 'add') {
+      event = {
+        action,
+        value: input,
+        index: value.length,
+        newValue: [...value].push(input),
+        oldValue: value,
+      };
     }
-    setSearchKey(search);
+    event && handleValueChange(event);
   };
 
   return (

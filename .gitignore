@@ -110,3 +110,7 @@ dist
 
 # parcel cache
 .parcel-cache/
+
+# tests
+__tests__/
+*.test
