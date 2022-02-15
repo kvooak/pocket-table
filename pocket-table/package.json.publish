@@ -1,6 +1,6 @@
 {
   "name": "react-pocket-table",
-  "version": "0.0.1-alpha.11",
+  "version": "0.0.1-alpha.12",
   "description": "Flexible MUI Table built on react-table",
   "license": "MIT",
   "author": "Quang Hoang <quang.hd@gmx.de>",

@@ -163,16 +163,15 @@ const Row = ({
     onBlur,
   } = prioritizedRowEventHandlers;
 
-
   const handleMouseEnter = (...args) => {
     if (highlightRowOnHover) setHovered((prev) => !prev);
     onMouseEnter && onMouseEnter(...args);
-  }
+  };
 
   const handleMouseLeave = (...args) => {
     if (highlightRowOnHover) setHovered((prev) => !prev);
     onMouseLeave && onMouseLeave(...args);
-  }
+  };
 
   return (
     <CustomRow

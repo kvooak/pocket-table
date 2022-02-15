@@ -10,9 +10,9 @@ import Typography from '@mui/material/Typography';
 import muiPaper from '@mui/material/Paper';
 import { styled as muiStyled } from '@mui/material/styles';
 import styled from '@emotion/styled';
-import BaseTag from './Visuals/BaseTag';
+import BaseTag from '../Cells/Visuals/BaseTag';
 import Popover from '@mui/material/Popover';
-import { useKeyPress } from '../../utils';
+import { useKeyPress } from '../utils';
 
 const EditValueAreaDiv = styled.div`
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
@@ -208,7 +208,7 @@ Option.propTypes = {
   options: PropTypes.instanceOf(Array),
 };
 
-const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
+const MultiselectMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   const { column, row, value } = cell;
   const cellKey = cell.getCellProps();
   const open = Boolean(anchorEl);
@@ -299,11 +299,11 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   );
 };
 
-ArrayMenu.defaultProps = {
+MultiselectMenu.defaultProps = {
   anchorEl: null,
 };
 
-ArrayMenu.propTypes = {
+MultiselectMenu.propTypes = {
   anchorEl: PropTypes.instanceOf(Object),
   cell: PropTypes.instanceOf(Object).isRequired,
   options: PropTypes.instanceOf(Array).isRequired,
@@ -311,4 +311,4 @@ ArrayMenu.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default ArrayMenu;
+export default MultiselectMenu;
