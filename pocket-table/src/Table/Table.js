@@ -65,10 +65,11 @@ const HeaderDiv = styled.div`
 `;
 
 const Header = ({ column, ...props }) => {
-  const content = column.render('Header');
+  const header = column.render('Header');
+
   return (
     <HeaderDiv {...props}>
-      {content}
+      {header}
       <Resizer
         {...column.getResizerProps()}
         className={`${column.isResizing ? 'resizing' : ''}`}

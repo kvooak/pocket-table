@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from '@emotion/styled';
 
 const HeaderDiv = styled.div`
@@ -17,7 +16,7 @@ const HeaderDiv = styled.div`
   }
 `;
 
-const BaseHeader = ({ title, ...props }) => {
+const BaseHeader = ({ title }) => {
   return <HeaderDiv>{title}</HeaderDiv>;
 };
 

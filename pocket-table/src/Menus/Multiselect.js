@@ -35,10 +35,12 @@ const OptionAreaDiv = styled.div`
 `;
 
 const OptionItemDiv = styled.div`
-  white-space: pre-line;
+  display: flex;
+  white-space: pre;
   justify-content: flex-start;
-  line-height: 24px;
-  height: 24px;
+  align-items: center;
+  line-height: 28px;
+  height: 28px;
   padding-left: 10px;
   transition: all 0.08s;
   cursor: pointer;
@@ -210,10 +212,10 @@ Option.propTypes = {
 
 const MultiselectMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   const { column, row, value } = cell;
-  const cellKey = cell.getCellProps();
+  const { key: cellKey } = cell.getCellProps();
   const open = Boolean(anchorEl);
   const dataKey = column.id;
-  const id = open ? `array-menu-${cellKey}` : undefined;
+  const id = open ? `multiselect-menu-${cellKey}` : undefined;
   const { onChange } = onMenuEvent;
   const [searchKey, setSearchKey] = useState(null);
 
