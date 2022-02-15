@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import muiPaper from '@mui/material/Paper';
@@ -57,7 +63,7 @@ const Paper = muiStyled(muiPaper)({
   width: '300px',
 });
 
-const CellValueInput = ({ onKeyDown, ...props }) => {
+const CellValueInput = React.memo(({ onKeyDown, ...props }) => {
   const ref = useRef();
   const keyPress = useKeyPress(ref.current);
   const [input, setInput] = useState(null);
@@ -80,7 +86,7 @@ const CellValueInput = ({ onKeyDown, ...props }) => {
   };
 
   return <StyledInput ref={ref} {...props} onInput={handleKeyDown} />;
-};
+});
 
 const CellValue = ({ value, onChange }) => {
   const handleDeleteItem = (itemValue, itemIndex) => {
@@ -205,12 +211,15 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   const { onChange } = onMenuEvent;
   const [searchKey, setSearchKey] = useState(null);
 
-  const handleValueChange = (event) => {
-    event.dataKey = dataKey;
-    event.rowIndex = row.index;
-    onChange(event);
-    setSearchKey(null);
-  };
+  const handleValueChange = useCallback(
+    (event) => {
+      event.dataKey = dataKey;
+      event.rowIndex = row.index;
+      onChange(event);
+      setSearchKey(null);
+    },
+    [setSearchKey],
+  );
 
   const displayOptions = useMemo(() => {
     const searchResult = options.filter((value) => {
@@ -221,29 +230,32 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
     return searchResult;
   }, [searchKey]);
 
-  const handleInputChange = ({ action, input }) => {
-    let event;
-    setSearchKey(input);
-    if (action === 'delete') {
-      const deleteIndex = value.length - 1;
-      event = {
-        action,
-        value: value[deleteIndex],
-        index: deleteIndex,
-        newValue: value.slice(0, -1),
-        oldValue: value,
-      };
-    } else if (action === 'add') {
-      event = {
-        action,
-        value: input,
-        index: value.length,
-        newValue: [...value].push(input),
-        oldValue: value,
-      };
-    }
-    event && handleValueChange(event);
-  };
+  const handleInputChange = useCallback(
+    ({ action, input }) => {
+      let event;
+      setSearchKey(input);
+      if (action === 'delete') {
+        const deleteIndex = value.length - 1;
+        event = {
+          action,
+          value: value[deleteIndex],
+          index: deleteIndex,
+          newValue: value.slice(0, -1),
+          oldValue: value,
+        };
+      } else if (action === 'add') {
+        event = {
+          action,
+          value: input,
+          index: value.length,
+          newValue: [...value, input],
+          oldValue: value,
+        };
+      }
+      event && handleValueChange(event);
+    },
+    [value, setSearchKey, handleValueChange],
+  );
 
   return (
     <Popover
@@ -260,6 +272,7 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
         <EditValueAreaDiv>
           <CellValue value={value} onChange={handleValueChange} />
           <CellValueInput
+            key={value.length}
             spellCheck={false}
             placeholder="Search for an option"
             onKeyDown={handleInputChange}
