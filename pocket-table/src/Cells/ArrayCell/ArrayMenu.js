@@ -15,9 +15,8 @@ import Popover from '@mui/material/Popover';
 import { useKeyPress } from '../../utils';
 
 const EditValueAreaDiv = styled.div`
-  padding-top: 8px;
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-  background: rgba(55, 53, 47, 0.06);
+  background: rgba(242, 241, 238, 0.6);
   cursor: text;
 `;
 
@@ -25,7 +24,7 @@ const CellValueDiv = styled.div`
   display: inline-block;
   width: 100%;
   height: 100%;
-  padding: 0 10px 0 10px;
+  padding: 8px 10px 0 10px;
 `;
 
 const OptionAreaDiv = styled.div`
@@ -54,8 +53,8 @@ const StyledInput = styled.input`
   border: none;
   line-height: 24px;
   height: 24px;
-  font-size: 0.8rem;
-  padding: 0 8px;
+  font-size: 0.9rem;
+  padding: 4px 8px;
 `;
 
 const Paper = muiStyled(muiPaper)({
@@ -67,7 +66,6 @@ const CellValueInput = React.memo(({ onKeyDown, ...props }) => {
   const ref = useRef();
   const keyPress = useKeyPress(ref.current);
   const [input, setInput] = useState(null);
-  // TODO: add shortcut Enter for creating new Item
   useEffect(() => {
     if (keyPress) {
       let action;
@@ -142,7 +140,12 @@ const OptionItem = ({ value, isNew, index, onChange }) => {
   };
 
   return (
-    <OptionItemDiv role="button" onClick={handleAddValue}>
+    <OptionItemDiv
+      role="button"
+      ariaPressed="false"
+      tabIndex="0"
+      onClick={handleAddValue}
+    >
       <Typography variant="subtitle2" component="span">
         {isNew && 'Create '}
       </Typography>
@@ -165,21 +168,11 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
   };
 
   const optionComponents = useMemo(() => {
-    const components = [];
-    if (options.length !== 1 && searchKey) {
-      const createNew = (
-        <OptionItem
-          isNew
-          key={`create-${searchKey}`}
-          value={searchKey}
-          onChange={handleCellValueChange}
-        />
-      );
-      components.push(createNew);
-    }
-    const selectFromList = options
-      .filter((option) => !cellValue.includes(option))
-      .map((value, index) => (
+    let selectFromList = [];
+    let createNew = null;
+    const optionList = options.filter((option) => !cellValue.includes(option));
+    if (optionList.length) {
+      selectFromList = optionList.map((value, index) => (
         <OptionItem
           key={value}
           value={value}
@@ -187,9 +180,22 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
           onChange={handleCellValueChange}
         />
       ));
-    components.push(...selectFromList);
+    }
+
+    if (!selectFromList.length && searchKey && !cellValue.includes(searchKey)) {
+      createNew = (
+        <OptionItem
+          isNew
+          key={`create-${searchKey}`}
+          value={searchKey}
+          onChange={handleCellValueChange}
+        />
+      );
+    }
+
+    const components = [...selectFromList, createNew];
     return components;
-  }, [searchKey, options, cellValue]);
+  }, [searchKey, options, cellValue, onChange]);
 
   return optionComponents;
 };
@@ -243,7 +249,7 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
           newValue: value.slice(0, -1),
           oldValue: value,
         };
-      } else if (action === 'add') {
+      } else if (action === 'add' && input && !value.includes(input)) {
         event = {
           action,
           value: input,
