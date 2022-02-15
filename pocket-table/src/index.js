@@ -1,3 +1,3 @@
 export { default as Table } from "./Table/Table";
-export { default as ArrayCell } from "./Cells/ArrayCell/ArrayCell";
+export { default as MultiselectCell } from "./Cells/Mutiselect";
 export { mapColumnsToReactTable } from "./utils";

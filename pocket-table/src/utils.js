@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
-import ArrayMenu from './Cells/ArrayCell/ArrayMenu';
+import MultiselectMenu from './Menus/Multiselect';
 
 // use as anchor for cell menu
 const MenuAnchor = styled.div`
@@ -14,7 +14,7 @@ const CellMenu = React.memo(
   ({ cell, type, options, anchorEl, onClose, onMenuEvent }) => {
     if (type === 'array')
       return (
-        <ArrayMenu
+        <MultiselectMenu
           cell={cell}
           options={options}
           anchorEl={anchorEl}
@@ -79,10 +79,10 @@ export const mapColumnsToReactTable = (columns) => {
     if (isEmpty(custom)) return col;
     if (!Cell) {
       // no cell but has custom, return complete
-      // custom cell with type
+      // custom cell with auto-detected type
       return null;
     }
-    // has both Cell and extra, ignore type,
+    // has both Cell and custom, ignore type,
     // use anchor wrapper for cell menu
     const { type, hasMenu, menuOptions, menuEventHandlers } = custom;
     if (!hasMenu) return col;
@@ -99,7 +99,6 @@ export const mapColumnsToReactTable = (columns) => {
       ),
     };
   };
-
   return columns.map(reactTableColMapper);
 };
 

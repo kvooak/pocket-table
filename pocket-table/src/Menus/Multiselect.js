@@ -1,17 +1,22 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import muiPaper from '@mui/material/Paper';
 import { styled as muiStyled } from '@mui/material/styles';
 import styled from '@emotion/styled';
-import BaseTag from './Visuals/BaseTag';
+import BaseTag from '../Cells/Visuals/BaseTag';
 import Popover from '@mui/material/Popover';
-import { useKeyPress } from '../../utils';
+import { useKeyPress } from '../utils';
 
 const EditValueAreaDiv = styled.div`
-  padding-top: 8px;
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-  background: rgba(55, 53, 47, 0.06);
+  background: rgba(242, 241, 238, 0.6);
   cursor: text;
 `;
 
@@ -19,7 +24,7 @@ const CellValueDiv = styled.div`
   display: inline-block;
   width: 100%;
   height: 100%;
-  padding: 0 10px 0 10px;
+  padding: 8px 10px 0 10px;
 `;
 
 const OptionAreaDiv = styled.div`
@@ -48,8 +53,8 @@ const StyledInput = styled.input`
   border: none;
   line-height: 24px;
   height: 24px;
-  font-size: 0.8rem;
-  padding: 0 8px;
+  font-size: 0.9rem;
+  padding: 4px 8px;
 `;
 
 const Paper = muiStyled(muiPaper)({
@@ -57,11 +62,10 @@ const Paper = muiStyled(muiPaper)({
   width: '300px',
 });
 
-const CellValueInput = ({ onKeyDown, ...props }) => {
+const CellValueInput = React.memo(({ onKeyDown, ...props }) => {
   const ref = useRef();
   const keyPress = useKeyPress(ref.current);
   const [input, setInput] = useState(null);
-  // TODO: add shortcut Enter for creating new Item
   useEffect(() => {
     if (keyPress) {
       let action;
@@ -80,7 +84,7 @@ const CellValueInput = ({ onKeyDown, ...props }) => {
   };
 
   return <StyledInput ref={ref} {...props} onInput={handleKeyDown} />;
-};
+});
 
 const CellValue = ({ value, onChange }) => {
   const handleDeleteItem = (itemValue, itemIndex) => {
@@ -136,7 +140,12 @@ const OptionItem = ({ value, isNew, index, onChange }) => {
   };
 
   return (
-    <OptionItemDiv role="button" onClick={handleAddValue}>
+    <OptionItemDiv
+      role="button"
+      ariaPressed="false"
+      tabIndex="0"
+      onClick={handleAddValue}
+    >
       <Typography variant="subtitle2" component="span">
         {isNew && 'Create '}
       </Typography>
@@ -159,21 +168,11 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
   };
 
   const optionComponents = useMemo(() => {
-    const components = [];
-    if (options.length !== 1 && searchKey) {
-      const createNew = (
-        <OptionItem
-          isNew
-          key={`create-${searchKey}`}
-          value={searchKey}
-          onChange={handleCellValueChange}
-        />
-      );
-      components.push(createNew);
-    }
-    const selectFromList = options
-      .filter((option) => !cellValue.includes(option))
-      .map((value, index) => (
+    let selectFromList = [];
+    let createNew = null;
+    const optionList = options.filter((option) => !cellValue.includes(option));
+    if (optionList.length) {
+      selectFromList = optionList.map((value, index) => (
         <OptionItem
           key={value}
           value={value}
@@ -181,9 +180,22 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
           onChange={handleCellValueChange}
         />
       ));
-    components.push(...selectFromList);
+    }
+
+    if (!selectFromList.length && searchKey && !cellValue.includes(searchKey)) {
+      createNew = (
+        <OptionItem
+          isNew
+          key={`create-${searchKey}`}
+          value={searchKey}
+          onChange={handleCellValueChange}
+        />
+      );
+    }
+
+    const components = [...selectFromList, createNew];
     return components;
-  }, [searchKey, options, cellValue]);
+  }, [searchKey, options, cellValue, onChange]);
 
   return optionComponents;
 };
@@ -196,7 +208,7 @@ Option.propTypes = {
   options: PropTypes.instanceOf(Array),
 };
 
-const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
+const MultiselectMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   const { column, row, value } = cell;
   const cellKey = cell.getCellProps();
   const open = Boolean(anchorEl);
@@ -205,12 +217,15 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   const { onChange } = onMenuEvent;
   const [searchKey, setSearchKey] = useState(null);
 
-  const handleValueChange = (event) => {
-    event.dataKey = dataKey;
-    event.rowIndex = row.index;
-    onChange(event);
-    setSearchKey(null);
-  };
+  const handleValueChange = useCallback(
+    (event) => {
+      event.dataKey = dataKey;
+      event.rowIndex = row.index;
+      onChange(event);
+      setSearchKey(null);
+    },
+    [setSearchKey],
+  );
 
   const displayOptions = useMemo(() => {
     const searchResult = options.filter((value) => {
@@ -221,29 +236,32 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
     return searchResult;
   }, [searchKey]);
 
-  const handleInputChange = ({ action, input }) => {
-    let event;
-    setSearchKey(input);
-    if (action === 'delete') {
-      const deleteIndex = value.length - 1;
-      event = {
-        action,
-        value: value[deleteIndex],
-        index: deleteIndex,
-        newValue: value.slice(0, -1),
-        oldValue: value,
-      };
-    } else if (action === 'add') {
-      event = {
-        action,
-        value: input,
-        index: value.length,
-        newValue: [...value].push(input),
-        oldValue: value,
-      };
-    }
-    event && handleValueChange(event);
-  };
+  const handleInputChange = useCallback(
+    ({ action, input }) => {
+      let event;
+      setSearchKey(input);
+      if (action === 'delete') {
+        const deleteIndex = value.length - 1;
+        event = {
+          action,
+          value: value[deleteIndex],
+          index: deleteIndex,
+          newValue: value.slice(0, -1),
+          oldValue: value,
+        };
+      } else if (action === 'add' && input && !value.includes(input)) {
+        event = {
+          action,
+          value: input,
+          index: value.length,
+          newValue: [...value, input],
+          oldValue: value,
+        };
+      }
+      event && handleValueChange(event);
+    },
+    [value, setSearchKey, handleValueChange],
+  );
 
   return (
     <Popover
@@ -260,6 +278,7 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
         <EditValueAreaDiv>
           <CellValue value={value} onChange={handleValueChange} />
           <CellValueInput
+            key={value.length}
             spellCheck={false}
             placeholder="Search for an option"
             onKeyDown={handleInputChange}
@@ -280,11 +299,11 @@ const ArrayMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   );
 };
 
-ArrayMenu.defaultProps = {
+MultiselectMenu.defaultProps = {
   anchorEl: null,
 };
 
-ArrayMenu.propTypes = {
+MultiselectMenu.propTypes = {
   anchorEl: PropTypes.instanceOf(Object),
   cell: PropTypes.instanceOf(Object).isRequired,
   options: PropTypes.instanceOf(Array).isRequired,
@@ -292,4 +311,4 @@ ArrayMenu.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default ArrayMenu;
+export default MultiselectMenu;
