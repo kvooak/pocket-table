@@ -12,7 +12,7 @@ const MenuAnchor = styled.div`
 
 const CellMenu = React.memo(
   ({ cell, type, options, anchorEl, onClose, onMenuEvent }) => {
-    if (type === 'array')
+    if (type === 'multiselect')
       return (
         <MultiselectMenu
           cell={cell}
@@ -36,11 +36,7 @@ const CellWithMenu = React.memo(
 
     return (
       <>
-        <MenuAnchor
-          id={`menu-anchor-${key}`}
-          className="menu-anchor"
-          onClick={handleShowMenu}
-        >
+        <MenuAnchor id={`menu-anchor-${key}`} onClick={handleShowMenu}>
           {callback({ cell })}
         </MenuAnchor>
 
@@ -65,6 +61,68 @@ CellWithMenu.propTypes = {
   menuOptions: PropTypes.instanceOf(Array),
 };
 
+const HeaderMenu = ({
+  column,
+  type,
+  allowInsertColumn,
+  allowSort,
+  allowTypeChange,
+  anchorEl,
+  onClose,
+  onMenuEvent,
+}) => {
+  return null;
+};
+
+const HeaderWithMenu = ({
+  callback,
+  column,
+  type,
+  allowInsertColumn,
+  allowSort,
+  allowTypeChange,
+  onMenuEvent,
+}) => {
+  const { key } = column.getHeaderProps();
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleShowMenu = (event) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  return (
+    <>
+      <MenuAnchor id={`menu-anchor-${key}`} onClick={handleShowMenu}>
+        {typeof callback === 'string' ? callback : callback({ column })}
+      </MenuAnchor>
+
+      <HeaderMenu
+        column={column}
+        type={type}
+        allowInsertColumn={allowInsertColumn}
+        allowSort={allowSort}
+        allowTypeChange={allowTypeChange}
+        anchorEl={anchorEl}
+        onClose={handleShowMenu}
+        onMenuEvent={onMenuEvent}
+      />
+    </>
+  );
+};
+
+HeaderWithMenu.defaultProps = {
+  allowTypeChange: false,
+  allowSort: false,
+  allowInsertColumn: false,
+  callback: ({ column }) => {},
+};
+
+HeaderWithMenu.propTypes = {
+  allowTypeChange: PropTypes.bool,
+  allowSort: PropTypes.bool,
+  allowInsertColumn: PropTypes.bool,
+  callback: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+};
+
 export const mapColumnsToReactTable = (columns) => {
   const isEmpty = (obj) => {
     return (
@@ -75,28 +133,51 @@ export const mapColumnsToReactTable = (columns) => {
   };
 
   const reactTableColMapper = (col) => {
-    const { Cell, custom } = col;
+    const { Header, Cell, custom } = col;
     if (isEmpty(custom)) return col;
-    if (!Cell) {
-      // no cell but has custom, return complete
-      // custom cell with auto-detected type
-      return null;
-    }
     // has both Cell and custom, ignore type,
     // use anchor wrapper for cell menu
-    const { type, hasMenu, menuOptions, menuEventHandlers } = custom;
-    if (!hasMenu) return col;
-    return {
-      ...col,
-      Cell: ({ cell }) => (
+    const { type, cellMenu, header } = custom;
+    let renderHeader;
+    let renderCell;
+    if (cellMenu) {
+      const { menuOptions, menuEventHandlers: cellMenuEventHandlers } =
+        cellMenu;
+      renderCell = ({ cell }) => (
         <CellWithMenu
-          callback={Cell}
           cell={cell}
+          callback={Cell}
           type={type}
           menuOptions={menuOptions}
-          onMenuEvent={menuEventHandlers}
+          onMenuEvent={cellMenuEventHandlers}
         />
-      ),
+      );
+    }
+
+    if (header) {
+      const {
+        allowTypeChange,
+        allowSort,
+        allowInsertColumn,
+        menuEventHandlers: headerMenuEventHandlers,
+      } = header;
+
+      renderHeader = ({ column }) => (
+        <HeaderWithMenu
+          column={column}
+          callback={Header}
+          type={type}
+          allowInsertColumn={allowInsertColumn}
+          allowTypeChange={allowTypeChange}
+          allowSort={allowSort}
+          onMenuEvent={headerMenuEventHandlers}
+        />
+      );
+    }
+    return {
+      ...col,
+      Cell: renderCell || col.Cell,
+      Header: renderHeader || col.Header,
     };
   };
   return columns.map(reactTableColMapper);
