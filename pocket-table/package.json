@@ -2,8 +2,7 @@
   "private": true,
   "source": "__tests__/basic/index.html",
   "scripts": {
-    "start": "parcel",
-    "build": "parcel build"
+    "start": "parcel"
   },
   "engines": {
     "node": ">=12"
