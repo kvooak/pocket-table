@@ -112,5 +112,4 @@ dist
 .parcel-cache/
 
 # tests
-__tests__/
 *.test
