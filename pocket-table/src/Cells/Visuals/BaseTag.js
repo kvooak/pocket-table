@@ -13,7 +13,7 @@ const CustomChip = styled(Chip)({
   transition: 'all 0.1s',
   fontWeight: '400',
   color: 'rgba(55, 53, 47, 0.8)',
-  height: '18px',
+  height: '20px',
   '& .MuiChip-deleteIcon': {
     color: 'rgba(55, 53, 47, 0.5)',
     '&:hover': {

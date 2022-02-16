@@ -5,8 +5,9 @@ import styled from '@emotion/styled';
 
 const CustomTable = styled.div`
   display: table;
+  font-family: 'ui-sans-serif';
+  font-size: 0.8rem;
   margin-top: 20px;
-  font-weight: 500;
   border: 1px solid rgba(55, 53, 47, 0.1);
   border-bottom: 0;
   display: inline-block;
@@ -19,24 +20,10 @@ const CustomTableRowGroup = styled.div`
   display: table-row-group;
 `;
 
-const CustomTableHeaderGroup = styled.div``;
-
-const CustomHeader = styled.div`
-  position: relative;
-  font-weight: 600;
-  cursor: pointer;
-  color: rgba(55, 53, 47, 0.8);
-  background: white;
-  border-bottom: 1px solid rgba(55, 53, 47, 0.1);
-  border-right: 1px solid rgba(55, 53, 47, 0.1);
-  margin: 0;
-  padding: 0.5rem;
-  &.hover {
-    transition: all 0.1s;
-    margin-top: -1px;
-    background: rgba(55, 53, 47, 0.04);
-  }
+const CustomTableHeaderGroup = styled.div`
+  display: table-header-group;
 `;
+
 const CustomRow = styled.div`
   width: 100%;
   flex: 1 1;
@@ -72,36 +59,28 @@ const Resizer = styled.div`
   }
 `;
 
+const HeaderDiv = styled.div`
+  width: 100%;
+  height: 100%;
+`;
+
 const Header = ({ column, ...props }) => {
-  const content = column.render('Header');
-  const [hovered, setHovered] = useState(false);
-  const handleMouseMove = () => {
-    setHovered(!hovered);
-  };
+  const header = column.render('Header');
+
   return (
-    <CustomHeader
-      className={`header ${hovered ? 'hover' : ''}`}
-      role="button"
-      onMouseEnter={handleMouseMove}
-      onMouseLeave={handleMouseMove}
-      {...props}
-    >
-      {content}
+    <HeaderDiv {...props}>
+      {header}
       <Resizer
         {...column.getResizerProps()}
         className={`${column.isResizing ? 'resizing' : ''}`}
       />
-    </CustomHeader>
+    </HeaderDiv>
   );
 };
 
 const Cell = ({ cell, ...props }) => {
   const content = cell.render('Cell');
-  return (
-    <CustomCell className="cell" {...props}>
-      {content}
-    </CustomCell>
-  );
+  return <CustomCell {...props}>{content}</CustomCell>;
 };
 
 const Cells = ({
@@ -235,7 +214,7 @@ export default function Table({
     <CustomTable {...tableProps}>
       <CustomTableHeaderGroup>
         {headers.map((column) => (
-          <Header {...column.getHeaderProps()} column={column} />
+          <Header column={column} {...column.getHeaderProps()} />
         ))}
       </CustomTableHeaderGroup>
 
