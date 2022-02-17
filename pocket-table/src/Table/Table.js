@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useBlockLayout, useResizeColumns, useTable } from 'react-table';
+import { useBlockLayout, useResizeColumns } from 'react-table';
+import { createTable } from '@tanstack/react-table';
 import styled from '@emotion/styled';
 
 const CustomTable = styled.div`
@@ -60,20 +61,21 @@ const Resizer = styled.div`
 `;
 
 const HeaderDiv = styled.div`
-  width: 100%;
+  display: table-cell;
   height: 100%;
 `;
 
-const Header = ({ column, ...props }) => {
-  const header = column.render('Header');
-
+const Header = ({ header, ...props }) => {
+  const { width, minWidth, maxWidth } = header.column;
+  const rendered = header.renderHeader();
   return (
-    <HeaderDiv {...props}>
-      {header}
-      <Resizer
-        {...column.getResizerProps()}
-        className={`${column.isResizing ? 'resizing' : ''}`}
-      />
+    <HeaderDiv {...props} style={{ width, minWidth, maxWidth }}>
+      {rendered}
+      {/* TODO: Check again when v8 release with new resizing logic */}
+      {/* <Resizer
+        {...header.column.getResizerProps()}
+        className={`${header.column.isResizing ? 'resizing' : ''}`}
+      /> */}
     </HeaderDiv>
   );
 };
@@ -177,50 +179,62 @@ const Row = ({
 };
 
 export default function Table({
-  columns,
+  columns: customColumns,
   data,
   rowEventHandlers,
   cellEventHandlers,
   prioritizeCellHandlers,
   highlightRowOnHover,
 }) {
-  const defaultColumn = useMemo(
-    () => ({
-      minWidth: 40,
-      width: 300,
-      maxWidth: 600,
+  const table = createTable();
+  const { createGroup, createColumn, createColumns, useTable } = table;
+  const defaultColumn = {
+    minWidth: 40,
+    width: 300,
+    maxWidth: 600,
+  };
+
+  const columns = createColumns(
+    customColumns.map((col) => {
+      const { header, id, cell, custom } = col;
+      return createColumn(id, {
+        id,
+        cell,
+        header,
+      });
     }),
-    [],
   );
 
-  const { getTableProps, getTableBodyProps, headers, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data,
-        defaultColumn,
-      },
-      useBlockLayout,
-      useResizeColumns,
-    );
+  const instance = useTable({
+    data,
+    columns,
+    defaultColumn,
+  });
+  // console.log(instance)
 
-  const tableProps = useMemo(() => getTableProps(), [getTableProps]);
-  const tableBodyProps = useMemo(
-    () => getTableBodyProps(),
-    [getTableBodyProps],
-  );
+  const {
+    getTableProps,
+    getTableBodyProps,
+    getRows,
+    getAllColumns,
+    getHeaderGroups,
+  } = instance;
+  const tableProps = getTableProps();
+  const tableBodyProps = getTableBodyProps();
+  const rows = getRows();
+  const headerGroups = getHeaderGroups();
+  const { headers } = headerGroups[0];
 
   return (
     <CustomTable {...tableProps}>
       <CustomTableHeaderGroup>
-        {headers.map((column) => (
-          <Header column={column} {...column.getHeaderProps()} />
+        {headers.map((header) => (
+          <Header header={header} {...header.getHeaderProps()} />
         ))}
       </CustomTableHeaderGroup>
 
       <CustomTableRowGroup {...tableBodyProps}>
         {rows.map((row) => {
-          prepareRow(row);
           return (
             <Row
               {...row.getRowProps()}

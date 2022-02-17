@@ -1,5 +1,6 @@
 __tests__/
 node_modules/
+.parcel-cache/
 .babelrc
 jsconfig.json
 package.json.test

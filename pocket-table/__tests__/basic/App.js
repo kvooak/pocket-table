@@ -1,44 +1,27 @@
 import { useState, useMemo } from 'react';
-import {
-  BaseHeader,
-  MultiselectCell,
-  Table,
-  mapColumnsToReactTable,
-} from '../../src/index';
+import { BaseHeader, MultiselectCell, Table } from '../../src/index';
 import users from './data/users';
 import { rowEventHandlers, cellEventHandlers, menuOptions } from './utils';
 
-export const createColumns = ({ custom }) => {
+export const createColumns = ({ menuEventHandlers }) => {
   const customColumns = [
     {
-      // Header: ({ column }) => <BaseHeader title="Name" />,
-      Header: 'Name',
-      accessor: 'name',
+      header: () => <BaseHeader title="Name" />,
+      id: 'name',
     },
     {
-      Header: () => <BaseHeader title="Email" />,
-      accessor: 'email',
+      header: () => <BaseHeader title="Email" />,
+      id: 'email',
     },
     {
-      Header: () => <BaseHeader title="Organization" />,
-      accessor: 'organization',
+      header: () => <BaseHeader title="Organization" />,
+      id: 'organization',
     },
     {
-      Header: () => <BaseHeader title="Status" />,
-      accessor: 'status',
-      //Cell: ({ cell }) => <div>{cell.toString()}</div>,
-      Cell: ({ cell }) => <MultiselectCell cell={cell} />,
+      header: () => <BaseHeader title="Status" />,
+      id: 'status',
+      cell: ({ cell }) => <MultiselectCell cell={cell} />,
       // ignore custom if Cell is provided by user
-      custom,
-    },
-  ];
-  return customColumns;
-};
-
-export default function App() {
-  const [data, setData] = useState(users);
-  const columns = useMemo(() => {
-    const customColumns = createColumns({
       custom: {
         // TODO: throw error if wrong type is provided
         //       ignore if Cell is provided & hasMenu isn't
@@ -54,20 +37,28 @@ export default function App() {
         },
         cellMenu: {
           menuOptions,
-          menuEventHandlers: {
-            onChange: (event) => {
-              const { dataKey, rowIndex, newValue } = event;
-              setData((prev) => {
-                const next = [...prev];
-                next[rowIndex][dataKey] = newValue;
-                return next;
-              });
-            },
-          },
+          menuEventHandlers,
         },
       },
-    });
-    return mapColumnsToReactTable(customColumns);
+    },
+  ];
+  return customColumns;
+};
+
+export default function App() {
+  const [data, setData] = useState(users);
+  const columns = useMemo(() => {
+    const menuEventHandlers = {
+      onChange: (event) => {
+        const { dataKey, rowIndex, newValue } = event;
+        setData((prev) => {
+          const next = [...prev];
+          next[rowIndex][dataKey] = newValue;
+          return next;
+        });
+      },
+    };
+    return createColumns({ menuEventHandlers });
   }, []);
 
   const table = useMemo(() => ({ columns, data }), [columns, data]);
