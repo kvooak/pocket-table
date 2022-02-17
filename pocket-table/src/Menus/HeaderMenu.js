@@ -142,9 +142,8 @@ const HeaderMenu = ({
   onClose,
   // onMenuEvent,
 }) => {
-  const { key: headerKey } = column.getHeaderProps();
   const open = Boolean(anchorEl);
-  const id = open ? `header-menu-${headerKey}` : undefined;
+  const id = open ? `header-menu-${column.id}` : undefined;
   // const { onChange } = onMenuEvent;
 
   const handleSelect = () => {

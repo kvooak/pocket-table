@@ -1,7 +1,14 @@
 import { useEffect, useState } from 'react';
+import { createTable } from '@tanstack/react-table';
 import { CellWithMenu, HeaderWithMenu } from './WithMenu';
+import { BaseHeader } from '.';
 
-export const mapColumnsToReactTable = (columns) => {
+// make sure that each column will have
+// header, cell, id properties
+export const mapColumnsToReactTable = ({
+  createColumn,
+  customColumns,
+}) => {
   const isEmpty = (obj) => {
     return (
       [null, undefined].includes(obj) ||
@@ -11,60 +18,79 @@ export const mapColumnsToReactTable = (columns) => {
   };
 
   const reactTableColMapper = (col) => {
-    const { Header, Cell, custom } = col;
-    if (isEmpty(custom)) return col;
-    // has both Cell and custom, ignore type,
-    // use anchor wrapper for cell menu
-    const { type, cellMenu, header } = custom;
-    let renderHeader;
-    let renderCell;
-    if (cellMenu) {
-      const { menuOptions, menuEventHandlers: cellMenuEventHandlers } =
-        cellMenu;
-      renderCell = ({ cell }) => (
-        <CellWithMenu
-          cell={cell}
-          callback={Cell}
-          type={type}
-          menuOptions={menuOptions}
-          onMenuEvent={cellMenuEventHandlers}
-        />
-      );
-    }
+    const { id, header: Header, cell: Cell, custom } = col;
+    let renderHeader = () => <BaseHeader title={id} />;
+    let renderCell = (info) => info.value;
 
-    if (header) {
-      const {
-        allowTypeChange,
-        allowSort,
-        allowInsertColumn,
-        allowHide,
-        allowDuplicate,
-        allowDelete,
-        menuEventHandlers: headerMenuEventHandlers,
-      } = header;
+    if (!isEmpty(custom)) {
+      const { type, cellMenu, header } = custom;
+      if (cellMenu) {
+        const { menuOptions, menuEventHandlers: cellMenuEventHandlers } =
+          cellMenu;
+        renderCell = ({ cell }) => (
+          <CellWithMenu
+            cell={cell}
+            callback={Cell}
+            type={type}
+            menuOptions={menuOptions}
+            onMenuEvent={cellMenuEventHandlers}
+          />
+        );
+      }
 
-      renderHeader = ({ column }) => (
-        <HeaderWithMenu
-          column={column}
-          callback={Header}
-          type={type}
-          allowInsertColumn={allowInsertColumn}
-          allowTypeChange={allowTypeChange}
-          allowSort={allowSort}
-          allowHide={allowHide}
-          allowDuplicate={allowDuplicate}
-          allowDelete={allowDelete}
-          onMenuEvent={headerMenuEventHandlers}
-        />
-      );
+      if (header) {
+        const {
+          allowTypeChange,
+          allowSort,
+          allowInsertColumn,
+          allowHide,
+          allowDuplicate,
+          allowDelete,
+          menuEventHandlers: headerMenuEventHandlers,
+        } = header;
+
+        renderHeader = ({ column }) => (
+          <HeaderWithMenu
+            column={column}
+            callback={Header}
+            type={type}
+            allowInsertColumn={allowInsertColumn}
+            allowTypeChange={allowTypeChange}
+            allowSort={allowSort}
+            allowHide={allowHide}
+            allowDuplicate={allowDuplicate}
+            allowDelete={allowDelete}
+            onMenuEvent={headerMenuEventHandlers}
+          />
+        );
+      }
     }
-    return {
-      ...col,
-      Cell: renderCell || col.Cell,
-      Header: renderHeader,
-    };
+    const reactTableColumn = createColumn(id, {
+      cell: renderCell,
+      header: renderHeader,
+    });
+    return reactTableColumn;
   };
-  return columns.map(reactTableColMapper);
+  return customColumns.map(reactTableColMapper);
+};
+
+export const createReactTable = ({
+  data,
+  columns: customColumns,
+  defaultColumn,
+}) => {
+  const table = createTable();
+  const { createColumn, useTable } = table;
+  const columns = mapColumnsToReactTable({
+    createColumn,
+    customColumns,
+  });
+  const instance = useTable({
+    data,
+    columns,
+    defaultColumn,
+  });
+  return instance;
 };
 
 export const useKeyPress = (element = window) => {

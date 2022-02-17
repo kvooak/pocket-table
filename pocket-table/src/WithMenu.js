@@ -73,7 +73,6 @@ export const HeaderWithMenu = ({
   allowDelete,
   onMenuEvent,
 }) => {
-  const { key } = column.getHeaderProps();
   const [anchorEl, setAnchorEl] = useState(null);
   const handleShowMenu = useCallback(
     (event) => {
@@ -84,7 +83,7 @@ export const HeaderWithMenu = ({
 
   return (
     <>
-      <MenuAnchor id={`menu-anchor-${key}`} onClick={handleShowMenu}>
+      <MenuAnchor id={`menu-anchor-${column.id}`} onClick={handleShowMenu}>
         {typeof callback === 'string' ? callback : callback({ column })}
       </MenuAnchor>
 
