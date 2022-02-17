@@ -7,6 +7,7 @@ export const createColumns = ({ menuEventHandlers }) => {
   const customColumns = [
     {
       header: () => <BaseHeader title="Name" />,
+      // TODO: enforce id
       id: 'name',
     },
     {
@@ -69,7 +70,6 @@ export default function App() {
       rowEventHandlers={rowEventHandlers}
       cellEventHandlers={cellEventHandlers}
       prioritizeCellHandlers={true}
-      highlightRowOnHover={true}
     />
   );
 }
