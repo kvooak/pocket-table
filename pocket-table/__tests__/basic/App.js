@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { BaseHeader, MultiselectCell, Table } from '../../src/index';
 import users from './data/users';
 import { rowEventHandlers, cellEventHandlers, menuOptions } from './utils';

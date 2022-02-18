@@ -63,36 +63,45 @@ const Paper = muiStyled(muiPaper)({
   width: '300px',
 });
 
-const CellValueInput = React.memo(({ onKeyDown, ...props }) => {
-  const ref = useRef();
-  const keyPress = useKeyPress(ref.current);
-  const [input, setInput] = useState(null);
-  useEffect(() => {
-    if (keyPress) {
-      let action;
-      if (!input && keyPress === 'Backspace') {
-        action = 'delete';
-      } else if (keyPress === 'Enter') {
-        action = 'add';
+const CellValueInput = React.memo(
+  ({ cellValue, onKeyDown, onKeyCommand, ...props }) => {
+    const ref = useRef();
+    const keyPress = useKeyPress(ref.current);
+    const [input, setInput] = useState(null);
+    useEffect(() => {
+      if (keyPress && ['Backspace', 'Enter'].includes(keyPress)) {
+        let type;
+        let index;
+        let newValue;
+        const oldValue = cellValue;
+        if (!input && keyPress === 'Backspace') {
+          type = 'delete';
+          index = cellValue.length - 1;
+          newValue = cellValue.slice(0, -1);
+        } else if (keyPress === 'Enter') {
+          type = 'add';
+          index = cellValue.length;
+          newValue = [...cellValue, input];
+        }
+        onKeyCommand({ type, value: input, index, newValue, oldValue });
       }
-      onKeyDown({ action, input });
-    }
-  }, [keyPress, input]);
+    }, [keyPress, input]);
 
-  const handleKeyDown = (event) => {
-    setInput(event.target.value);
-    onKeyDown({ input: event.target.value });
-  };
+    const handleKeyDown = (event) => {
+      setInput(event.target.value);
+      onKeyDown({ input: event.target.value });
+    };
 
-  return <StyledInput ref={ref} {...props} onInput={handleKeyDown} />;
-});
+    return <StyledInput ref={ref} {...props} onInput={handleKeyDown} />;
+  },
+);
 
-const CellValue = ({ value, onChange }) => {
+const CellValue = ({ value, onDeleteByClick }) => {
   const handleDeleteItem = (itemValue, itemIndex) => {
     const newValue = [...value];
     newValue.splice(itemIndex, 1);
-    onChange({
-      action: 'delete',
+    onDeleteByClick({
+      type: 'delete',
       value: itemValue,
       index: itemIndex,
       newValue,
@@ -136,8 +145,8 @@ const OptionAreaTitleDiv = ({ title }) => {
 
 const OptionItem = ({ value, isNew, index, onChange }) => {
   const handleAddValue = () => {
-    const action = isNew ? 'create' : 'add';
-    onChange({ action, value, index });
+    const type = isNew ? 'create' : 'add';
+    onChange({ type, value, index });
   };
 
   return (
@@ -155,12 +164,12 @@ const OptionItem = ({ value, isNew, index, onChange }) => {
   );
 };
 
-const Options = ({ options, searchKey, cellValue, onChange }) => {
-  handleCellValueChange = ({ action, value, index }) => {
+const Options = ({ options, searchKey, cellValue, onSelect }) => {
+  handleCellValueChange = ({ type, value, index }) => {
     const newValue = [...cellValue];
     newValue.splice(index, 0, value);
-    onChange({
-      action,
+    onSelect({
+      type,
       value,
       index,
       newValue,
@@ -196,7 +205,7 @@ const Options = ({ options, searchKey, cellValue, onChange }) => {
 
     const components = [...selectFromList, createNew];
     return components;
-  }, [searchKey, options, cellValue, onChange]);
+  }, [searchKey, options, cellValue]);
 
   return optionComponents;
 };
@@ -209,87 +218,87 @@ Option.propTypes = {
   options: PropTypes.instanceOf(Array),
 };
 
-const MultiselectMenu = React.memo(({ cell, options, onMenuEvent }) => {
-  const { column, row, value } = cell;
-  const dataKey = column.id;
-  const { onChange } = onMenuEvent;
-  const [searchKey, setSearchKey] = useState(null);
+const MultiselectMenu = React.memo(
+  ({ cell, options, onChange: onChangeCellValue }) => {
+    const { column, row, value: cellValue } = cell;
+    const dataKey = column.id;
+    const [searchKey, setSearchKey] = useState(null);
+    const [tempValue, setTempValue] = useState(cellValue);
 
-  const handleValueChange = useCallback(
-    (event) => {
-      event.dataKey = dataKey;
-      event.rowIndex = row.index;
-      onChange(event);
-      setSearchKey(null);
-    },
-    [setSearchKey],
-  );
+    const handleValueChange = useCallback(
+      (event) => {
+        event.dataKey = dataKey;
+        event.rowIndex = row.index;
+        onChangeCellValue(event);
+        setSearchKey(null);
+      },
+      [setSearchKey, onChangeCellValue],
+    );
 
-  const displayOptions = useMemo(() => {
-    const searchResult = options.filter((value) => {
-      if (!searchKey) return value;
-      return value.includes(searchKey);
-    });
-    if (!searchResult) return options;
-    return searchResult;
-  }, [searchKey]);
+    const displayOptions = useMemo(() => {
+      const searchResult = options.filter((value) => {
+        if (!searchKey) return value;
+        return tempValue.includes(searchKey);
+      });
+      if (!searchResult) return options;
+      return searchResult;
+    }, [searchKey, tempValue]);
 
-  const handleInputChange = useCallback(
-    ({ action, input }) => {
-      let event;
-      setSearchKey(input);
-      if (action === 'delete') {
-        const deleteIndex = value.length - 1;
-        event = {
-          action,
-          value: value[deleteIndex],
-          index: deleteIndex,
-          newValue: value.slice(0, -1),
-          oldValue: value,
-        };
-      } else if (action === 'add' && input && !value.includes(input)) {
-        event = {
-          action,
-          value: input,
-          index: value.length,
-          newValue: [...value, input],
-          oldValue: value,
-        };
-      }
-      event && handleValueChange(event);
-    },
-    [value, setSearchKey, handleValueChange],
-  );
+    const updateTempState = (event) => {
+      const { newValue } = event;
+      setTempValue(newValue);
+    };
 
-  return (
-    <Paper>
-      <EditValueAreaDiv>
-        <CellValue value={value} onChange={handleValueChange} />
-        <CellValueInput
-          key={value.length}
-          spellCheck={false}
-          placeholder="Search for an option"
-          onKeyDown={handleInputChange}
-          autoFocus
-        />
-      </EditValueAreaDiv>
-      <OptionAreaDiv>
-        <OptionAreaTitleDiv title="Select an option or create one" />
-        <Options
-          options={displayOptions}
-          searchKey={searchKey}
-          cellValue={value}
-          onChange={handleValueChange}
-        />
-      </OptionAreaDiv>
-    </Paper>
-  );
-});
+    const handleCommand = useCallback(
+      (action) => {
+        let event = { ...action };
+        const { type, value } = event;
+        if (type === 'add' && value && tempValue.includes(value)) {
+          event = undefined;
+        }
+        event && updateTempState(event);
+        event && handleValueChange(event);
+      },
+      [updateTempState, tempValue, setSearchKey, handleValueChange],
+    );
+
+    const handleInputChange = useCallback(
+      ({ input }) => setSearchKey(input),
+      [],
+    );
+
+    return (
+      <Paper>
+        <EditValueAreaDiv>
+          <CellValue value={tempValue} onDeleteByClick={handleCommand} />
+          <CellValueInput
+            key={tempValue.length}
+            cellValue={tempValue}
+            spellCheck={false}
+            placeholder="Search for an option"
+            onKeyDown={handleInputChange}
+            onKeyCommand={handleCommand}
+            autoFocus
+          />
+        </EditValueAreaDiv>
+        <OptionAreaDiv>
+          <OptionAreaTitleDiv title="Select an option or create one" />
+          <Options
+            options={displayOptions}
+            searchKey={searchKey}
+            cellValue={tempValue}
+            onSelect={handleCommand}
+          />
+        </OptionAreaDiv>
+      </Paper>
+    );
+  },
+);
 
 MultiselectMenu.propTypes = {
   cell: PropTypes.instanceOf(Object).isRequired,
   options: PropTypes.instanceOf(Array).isRequired,
-  onMenuEvent: PropTypes.instanceOf(Object).isRequired,
+  onChange: PropTypes.instanceOf(Object).isRequired,
 };
 
 export default MultiselectMenu;

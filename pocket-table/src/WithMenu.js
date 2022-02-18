@@ -12,7 +12,7 @@ const MenuAnchor = styled.div`
 `;
 
 const CellMenu = React.memo(
-  ({ cell, type, options, anchorEl, onClose, onMenuEvent }) => {
+  ({ cell, type, options, anchorEl, onClose, onChange }) => {
     const { key: cellKey } = cell.getCellProps();
     const open = Boolean(anchorEl);
     const id = open ? `multiselect-menu-${cellKey}` : undefined;
@@ -25,7 +25,7 @@ const CellMenu = React.memo(
             options={options}
             anchorEl={anchorEl}
             onClose={onClose}
-            onMenuEvent={onMenuEvent}
+            onChange={onChange}
           />
         );
       return null;
@@ -59,6 +59,15 @@ export const CellWithMenu = React.memo(
       [anchorEl, setAnchorEl],
     );
 
+    const [menuEvent, setMenuEvent] = useState(null);
+    const queueChange = (event) => {
+      setMenuEvent(event);
+    };
+
+    useEffect(() => {
+      !anchorEl && menuEvent && onMenuEvent.onChange(menuEvent);
+    }, [anchorEl]);
+
     const cellMenuComponent = useMemo(() => {
       if (!anchorEl) return null;
       return (
@@ -68,7 +77,7 @@ export const CellWithMenu = React.memo(
           options={menuOptions}
           anchorEl={anchorEl}
           onClose={handleShowMenu}
-          onMenuEvent={onMenuEvent}
+          onChange={queueChange}
         />
       );
     }, [anchorEl, handleShowMenu]);
