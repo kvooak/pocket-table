@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from '@emotion/styled';
 
 const HeaderGroupDiv = styled.div`
@@ -25,10 +26,11 @@ const HeaderGroupDiv = styled.div`
 
 const HeaderDiv = styled.div`
   display: table-cell;
+  padding: 0;
   height: 100%;
 `;
 
-const Header = ({ header, ...props }) => {
+const Header = React.memo(({ header, ...props }) => {
   const { width, minWidth, maxWidth } = header.column;
   const rendered = header.renderHeader();
   return (
@@ -41,7 +43,7 @@ const Header = ({ header, ...props }) => {
       /> */}
     </HeaderDiv>
   );
-};
+});
 
 const Headers = ({ headers }) => {
   return (
@@ -52,5 +54,11 @@ const Headers = ({ headers }) => {
     </HeaderGroupDiv>
   );
 };
+
+// Headers.whyDidYouRender = {
+//   logOnDifferentValues: true,
+//   customName: 'Headers',
+// };
+
 
 export default Headers;
