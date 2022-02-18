@@ -23,18 +23,21 @@ const CustomChip = styled(Chip)({
 });
 
 const BaseTag = ({
-  value,
+  value: label,
   index,
   clickable,
   onDelete,
   backgroundColor,
   color,
 }) => {
-  const label = useMemo(() => value.toUpperCase(), []);
-  const sx = {
-    backgroundColor: backgroundColor || CONSTANTS.NEUTRAL_BACKGROUND,
-    color: color || CONSTANTS.NEUTRAL_COLOR,
-  };
+  const sx = useMemo(
+    () => ({
+      backgroundColor: backgroundColor || CONSTANTS.NEUTRAL_BACKGROUND,
+      color: color || CONSTANTS.NEUTRAL_COLOR,
+      letterSpacing: '0.8px',
+    }),
+    [],
+  );
   const handleDeleteTag = () => {
     onDelete && onDelete(value, index);
   };
