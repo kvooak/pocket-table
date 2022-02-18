@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import Cells from './Cells';
 
@@ -65,7 +65,14 @@ const Row = ({
   );
 };
 
-const Rows = ({
+Row.whyDidYouRender = {
+  logOnDifferentValues: true,
+  logOwnerReasons: true,
+  customName: 'Row',
+};
+
+
+const Rows = React.memo(({
   tableBodyProps,
   rows,
   rowEventHandlers,
@@ -85,6 +92,12 @@ const Rows = ({
       ))}
     </RowGroupDiv>
   );
+});
+
+Rows.whyDidYouRender = {
+  logOnDifferentValues: true,
+  logOwnerReasons: true,
+  customName: 'Rows',
 };
 
 export default Rows;

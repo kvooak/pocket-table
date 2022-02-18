@@ -11,7 +11,6 @@ import muiPaper from '@mui/material/Paper';
 import { styled as muiStyled } from '@mui/material/styles';
 import styled from '@emotion/styled';
 import BaseTag from '../Cells/Visuals/BaseTag';
-import Popover from '@mui/material/Popover';
 import { useKeyPress } from '../utils';
 
 const EditValueAreaDiv = styled.div`
@@ -210,12 +209,9 @@ Option.propTypes = {
   options: PropTypes.instanceOf(Array),
 };
 
-const MultiselectMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
+const MultiselectMenu = React.memo(({ cell, options, onMenuEvent }) => {
   const { column, row, value } = cell;
-  const { key: cellKey } = cell.getCellProps();
-  const open = Boolean(anchorEl);
   const dataKey = column.id;
-  const id = open ? `multiselect-menu-${cellKey}` : undefined;
   const { onChange } = onMenuEvent;
   const [searchKey, setSearchKey] = useState(null);
 
@@ -266,51 +262,34 @@ const MultiselectMenu = ({ anchorEl, cell, options, onClose, onMenuEvent }) => {
   );
 
   return (
-    <Popover
-      id={id}
-      open={open}
-      anchorEl={anchorEl}
-      onClose={onClose}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }}
-    >
-      <Paper>
-        <EditValueAreaDiv>
-          <CellValue value={value} onChange={handleValueChange} />
-          <CellValueInput
-            key={value.length}
-            spellCheck={false}
-            placeholder="Search for an option"
-            onKeyDown={handleInputChange}
-            autoFocus
-          />
-        </EditValueAreaDiv>
-        <OptionAreaDiv>
-          <OptionAreaTitleDiv title="Select an option or create one" />
-          <Options
-            options={displayOptions}
-            searchKey={searchKey}
-            cellValue={value}
-            onChange={handleValueChange}
-          />
-        </OptionAreaDiv>
-      </Paper>
-    </Popover>
+    <Paper>
+      <EditValueAreaDiv>
+        <CellValue value={value} onChange={handleValueChange} />
+        <CellValueInput
+          key={value.length}
+          spellCheck={false}
+          placeholder="Search for an option"
+          onKeyDown={handleInputChange}
+          autoFocus
+        />
+      </EditValueAreaDiv>
+      <OptionAreaDiv>
+        <OptionAreaTitleDiv title="Select an option or create one" />
+        <Options
+          options={displayOptions}
+          searchKey={searchKey}
+          cellValue={value}
+          onChange={handleValueChange}
+        />
+      </OptionAreaDiv>
+    </Paper>
   );
-};
-
-MultiselectMenu.defaultProps = {
-  anchorEl: null,
-};
+});
 
 MultiselectMenu.propTypes = {
-  anchorEl: PropTypes.instanceOf(Object),
   cell: PropTypes.instanceOf(Object).isRequired,
   options: PropTypes.instanceOf(Array).isRequired,
   onMenuEvent: PropTypes.instanceOf(Object).isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default MultiselectMenu;

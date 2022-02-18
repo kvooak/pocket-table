@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { BaseHeader, MultiselectCell, Table } from '../../src/index';
 import users from './data/users';
 import { rowEventHandlers, cellEventHandlers, menuOptions } from './utils';
@@ -48,19 +48,20 @@ export const createColumns = ({ menuEventHandlers }) => {
 
 export default function App() {
   const [data, setData] = useState(users);
+  const menuEventHandlers = useMemo(() => ({
+    onChange: (event) => {
+      const { dataKey, rowIndex, newValue } = event;
+      setData((prev) => {
+        const next = [...prev];
+        next[rowIndex][dataKey] = newValue;
+        return next;
+      });
+    },
+  }), [setData]);
+
   const columns = useMemo(() => {
-    const menuEventHandlers = {
-      onChange: (event) => {
-        const { dataKey, rowIndex, newValue } = event;
-        setData((prev) => {
-          const next = [...prev];
-          next[rowIndex][dataKey] = newValue;
-          return next;
-        });
-      },
-    };
     return createColumns({ menuEventHandlers });
-  }, []);
+  }, [createColumns, menuEventHandlers]);
 
   const table = useMemo(() => ({ columns, data }), [columns, data]);
 

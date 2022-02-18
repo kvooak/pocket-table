@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
 const HeaderDiv = styled.div`
-  display: table-header;
+  display: relative;
   font-weight: 600;
   cursor: pointer;
   color: rgba(55, 53, 47, 0.8);
