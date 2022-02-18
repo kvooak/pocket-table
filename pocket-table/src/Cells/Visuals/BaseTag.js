@@ -39,7 +39,7 @@ const BaseTag = ({
     [],
   );
   const handleDeleteTag = () => {
-    onDelete && onDelete(value, index);
+    onDelete && onDelete(label, index);
   };
 
   return (
