@@ -34,7 +34,6 @@ const BaseTag = ({
     () => ({
       backgroundColor: backgroundColor || CONSTANTS.NEUTRAL_BACKGROUND,
       color: color || CONSTANTS.NEUTRAL_COLOR,
-      letterSpacing: '0.8px',
     }),
     [],
   );

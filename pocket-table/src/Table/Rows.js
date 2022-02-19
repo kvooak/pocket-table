@@ -15,16 +15,16 @@ const RowDiv = styled.div`
 
 const Row = ({
   row,
-  rowEventHandlers,
-  cellEventHandlers,
-  prioritizeCellHandlers,
+  rowEventHandler,
+  cellEventHandler,
+  prioritizeCellHandler,
   ...props
 }) => {
   const cells = row.getAllCells();
-  const prioritizedRowEventHandlers = useMemo(() => {
-    if (prioritizeCellHandlers) return {};
-    return rowEventHandlers;
-  }, [prioritizeCellHandlers, rowEventHandlers]);
+  const prioritizedrowEventHandler = useMemo(() => {
+    if (prioritizeCellHandler) return {};
+    return rowEventHandler;
+  }, [prioritizeCellHandler, rowEventHandler]);
 
   const {
     onClick,
@@ -34,7 +34,7 @@ const Row = ({
     onMouseUp,
     onFocus,
     onBlur,
-  } = prioritizedRowEventHandlers;
+  } = prioritizedrowEventHandler;
 
   const handleMouseEnter = (...args) => {
     onMouseEnter && onMouseEnter(...args);
@@ -59,9 +59,9 @@ const Row = ({
         cells={cells}
         // TODO: pass row data instead of cell data when this
         //       callback is called.
-        onCellEventsFallback={rowEventHandlers}
-        cellEventHandlers={cellEventHandlers}
-        prioritizeCellHandlers={prioritizeCellHandlers}
+        onCellEventsFallback={rowEventHandler}
+        cellEventHandler={cellEventHandler}
+        prioritizeCellHandler={prioritizeCellHandler}
       />
     </RowDiv>
   );
@@ -77,18 +77,18 @@ Row.whyDidYouRender = {
 const Rows = React.memo(({
   tableBodyProps,
   rows,
-  rowEventHandlers,
-  cellEventHandlers,
-  prioritizeCellHandlers,
+  rowEventHandler,
+  cellEventHandler,
+  prioritizeCellHandler,
 }) => {
   return (
     <RowGroupDiv {...tableBodyProps}>
       {rows.map((row) => (
         <Row
           {...row.getRowProps()}
-          rowEventHandlers={rowEventHandlers}
-          cellEventHandlers={cellEventHandlers}
-          prioritizeCellHandlers={prioritizeCellHandlers}
+          rowEventHandler={rowEventHandler}
+          cellEventHandler={cellEventHandler}
+          prioritizeCellHandler={prioritizeCellHandler}
           row={row}
         />
       ))}

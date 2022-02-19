@@ -3,7 +3,7 @@ export const handleOnRowMouseEnter = () => {};
 export const handleOnRowMouseLeave = () => {};
 export const handleOnCellClick = () => {};
 
-export const rowEventHandlers = {
+export const rowEventHandler = {
   onClick: () => handleOnRowClick(),
   onMouseEnter: () => handleOnRowMouseEnter(),
   onMouseLeave: () => handleOnRowMouseLeave(),
@@ -13,7 +13,7 @@ export const rowEventHandlers = {
   onBlur: () => {},
 };
 
-export const cellEventHandlers = {
+export const cellEventHandler = {
   name: {
     onClick: () => handleOnCellClick(),
   },

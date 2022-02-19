@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { BaseHeader, MultiselectCell, Table } from '../../src/index';
 import users from './data/users';
-import { rowEventHandlers, cellEventHandlers, menuOptions } from './utils';
+import { rowEventHandler, cellEventHandler, menuOptions } from './utils';
 
 export const createColumns = ({ menuEventHandlers }) => {
   const customColumns = [
@@ -48,29 +48,38 @@ export const createColumns = ({ menuEventHandlers }) => {
 
 export default function App() {
   const [data, setData] = useState(users);
-  const menuEventHandlers = useMemo(() => ({
-    onChange: (event) => {
-      const { dataKey, rowIndex, newValue } = event;
-      setData((prev) => {
-        const next = [...prev];
-        next[rowIndex][dataKey] = newValue;
-        return next;
-      });
-    },
-  }), [setData]);
+  const menuEventHandlers = useMemo(
+    () => ({
+      onChange: (event) => {
+        const { dataKey, rowIndex, newValue } = event;
+        setData((prev) => {
+          const next = [...prev];
+          next[rowIndex][dataKey] = newValue;
+          return next;
+        });
+      },
+    }),
+    [setData],
+  );
 
-  const columns = useMemo(() => {
-    return createColumns({ menuEventHandlers });
-  }, [createColumns, menuEventHandlers]);
-
-  const table = useMemo(() => ({ columns, data }), [columns, data]);
+  const columns = createColumns({ menuEventHandlers });
+  const columnEventHandler = {
+    onTypeChange: () => {},
+    onSort: () => {},
+    onInsert: () => {},
+    onHide: () => {},
+    onDuplicate: () => {},
+    onDelete: () => {},
+  };
+  const table = { columns, data, columnEventHandler };
 
   return (
     <Table
       {...table}
-      rowEventHandlers={rowEventHandlers}
-      cellEventHandlers={cellEventHandlers}
-      prioritizeCellHandlers={true}
+      columnEventHandler={columnEventHandler}
+      rowEventHandler={rowEventHandler}
+      cellEventHandler={cellEventHandler}
+      prioritizeCellHandler={true}
     />
   );
 }

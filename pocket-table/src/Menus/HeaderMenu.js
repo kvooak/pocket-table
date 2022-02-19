@@ -12,7 +12,8 @@ import DuplicateIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 
 const Paper = muiStyled(muiPaper)({
-  fontFamily: 'ui-sans-serif',
+  fontFamily: '"Roboto","Helvetica","Arial",sans-serif,"ui-sans-serif"',
+  fontSize: 'inherit',
   fontWeight: '400',
   color: 'inherit',
   width: '240px',

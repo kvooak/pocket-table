@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import Rows from './Rows';
@@ -10,7 +10,8 @@ const TableDiv = styled.div`
   table-layout: fixed;
   width: 100%;
   font-size: inherit;
-  font-family: 'ui-sans-serif';
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif, 'ui-sans-serif';
+  color: rgba(55, 53, 47, 0.96);
   margin-top: 20px;
   border: 1px solid rgba(55, 53, 47, 0.1);
   border-bottom: 0;
@@ -20,9 +21,10 @@ const Table = React.memo(
   ({
     columns: customColumns,
     data,
-    rowEventHandlers,
-    cellEventHandlers,
-    prioritizeCellHandlers,
+    columnEventHandler,
+    rowEventHandler,
+    cellEventHandler,
+    prioritizeCellHandler,
   }) => {
     const defaultColumn = {
       minWidth: 40,
@@ -30,11 +32,17 @@ const Table = React.memo(
       maxWidth: 300,
     };
 
+    const [sorting, setSorting] = useState([]);
     const table = createReactTable({
       data,
       columns: customColumns,
       defaultColumn,
+      state: {
+        sorting: true,
+      },
+      onSortingChange: setSorting,
     });
+    console.log(table)
 
     const { getTableProps, getTableBodyProps, getRows, getHeaderGroups } =
       table;
@@ -50,9 +58,9 @@ const Table = React.memo(
         <Rows
           tableBodyProps={tableBodyProps}
           rows={rows}
-          rowEventHandlers={rowEventHandlers}
-          cellEventHandlers={cellEventHandlers}
-          prioritizeCellHandlers={prioritizeCellHandlers}
+          rowEventHandler={rowEventHandler}
+          cellEventHandler={cellEventHandler}
+          prioritizeCellHandler={prioritizeCellHandler}
         />
       </TableDiv>
     );
@@ -60,9 +68,10 @@ const Table = React.memo(
 );
 
 Table.defaultProps = {
-  rowEventHandlers: {},
-  cellEventHandlers: {},
-  prioritizeCellHandlers: true,
+  columnEventHandler: {},
+  rowEventHandler: {},
+  cellEventHandler: {},
+  prioritizeCellHandler: true,
 };
 
 // Table.whyDidYouRender = {
@@ -72,9 +81,10 @@ Table.defaultProps = {
 // };
 
 Table.propTypes = {
-  rowEventHandlers: PropTypes.instanceOf(Object),
-  cellEventHandlers: PropTypes.instanceOf(Object),
-  prioritizeCellHandlers: PropTypes.bool,
+  columnEventHandler: PropTypes.instanceOf(Object),
+  rowEventHandler: PropTypes.instanceOf(Object),
+  cellEventHandler: PropTypes.instanceOf(Object),
+  prioritizeCellHandler: PropTypes.bool,
 };
 
 export default Table;

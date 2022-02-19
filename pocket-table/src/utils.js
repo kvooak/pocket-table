@@ -5,10 +5,7 @@ import { BaseHeader } from '.';
 
 // make sure that each column will have
 // header, cell, id properties
-export const mapColumnsToReactTable = ({
-  createColumn,
-  customColumns,
-}) => {
+export const mapColumnsToReactTable = ({ createColumn, customColumns }) => {
   const isEmpty = (obj) => {
     return (
       [null, undefined].includes(obj) ||
