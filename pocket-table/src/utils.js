@@ -5,7 +5,11 @@ import { BaseHeader } from '.';
 
 // make sure that each column will have
 // header, cell, id properties
-export const mapColumnsToReactTable = ({ createColumn, customColumns }) => {
+export const mapColumnsToReactTable = ({
+  createColumn,
+  customColumns,
+  columnEventHandler,
+}) => {
   const isEmpty = (obj) => {
     return (
       [null, undefined].includes(obj) ||
@@ -43,7 +47,6 @@ export const mapColumnsToReactTable = ({ createColumn, customColumns }) => {
           allowHide,
           allowDuplicate,
           allowDelete,
-          menuEventHandlers: headerMenuEventHandlers,
         } = header;
 
         renderHeader = ({ column }) => (
@@ -57,7 +60,7 @@ export const mapColumnsToReactTable = ({ createColumn, customColumns }) => {
             allowHide={allowHide}
             allowDuplicate={allowDuplicate}
             allowDelete={allowDelete}
-            onMenuEvent={headerMenuEventHandlers}
+            onMenuEvent={columnEventHandler}
           />
         );
       }
@@ -75,12 +78,14 @@ export const createReactTable = ({
   data,
   columns: customColumns,
   defaultColumn,
+  columnEventHandler,
 }) => {
   const table = createTable();
   const { createColumn, useTable } = table;
   const columns = mapColumnsToReactTable({
     createColumn,
     customColumns,
+    columnEventHandler,
   });
   const instance = useTable({
     data,

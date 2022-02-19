@@ -13,6 +13,7 @@
     "@tanstack/react-table": "^8.0.0-alpha.1",
     "@welldone-software/why-did-you-render": "^6.2.3",
     "parcel": "^2.3.1",
+    "path-browserify": "^1.0.1",
     "react-table": "^7.7.0"
   },
   "peerDependencies": {

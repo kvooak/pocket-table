@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import Rows from './Rows';
@@ -20,8 +20,8 @@ const TableDiv = styled.div`
 const Table = React.memo(
   ({
     columns: customColumns,
+    columnEventHandler: customColumnEventHandler,
     data,
-    columnEventHandler,
     rowEventHandler,
     cellEventHandler,
     prioritizeCellHandler,
@@ -32,17 +32,64 @@ const Table = React.memo(
       maxWidth: 300,
     };
 
-    const [sorting, setSorting] = useState([]);
+    const [bufferData, setBufferData] = useState(data);
+    const [action, setAction] = useState(null);
+
+    const createAction = ({ eventName, type, property, ...data }) => {
+      return { eventName, property, data: { ...data } };
+    };
+
+    const emitAction = (action) => {
+      customColumnEventHandler[action.eventName](action);
+    };
+
+    useEffect(() => {
+      action && emitAction(action);
+      return () => setAction(null);
+    }, [bufferData, action]);
+
+    const onSort = ({ type, sortBy }) => {
+      const compare = (a, b) => {
+        if (a[sortBy] > b[sortBy]) return 1;
+        if (a[sortBy] < b[sortBy]) return -1;
+        return 0;
+      };
+      let sorted = [...bufferData];
+      if (type === 'sort-desc') {
+        sorted = sorted.sort(compare);
+      }
+
+      if (type === 'sort-asc') {
+        sorted = sorted.sort(compare).reverse();
+      }
+      setBufferData(sorted);
+      setAction(
+        createAction({
+          eventName: onSort.name,
+          type,
+          property: sortBy,
+          newValue: sorted,
+          oldValue: bufferData,
+        }),
+      );
+    };
+
+    // TODO: merge customColumnEventHandler with this default handler
+    const columnEventHandler = {
+      onTypeChange: () => {},
+      onSort,
+      onInsert: () => {},
+      onHide: () => {},
+      onDuplicate: () => {},
+      onDelete: () => {},
+    };
+
     const table = createReactTable({
-      data,
+      data: bufferData,
       columns: customColumns,
       defaultColumn,
-      state: {
-        sorting: true,
-      },
-      onSortingChange: setSorting,
+      columnEventHandler,
     });
-    console.log(table)
 
     const { getTableProps, getTableBodyProps, getRows, getHeaderGroups } =
       table;

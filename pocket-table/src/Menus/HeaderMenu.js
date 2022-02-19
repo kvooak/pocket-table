@@ -46,9 +46,9 @@ const SelectTextDiv = styled.div`
   font-size: 0.8rem;
 `;
 
-const SelectItem = ({ icon, text, onClick }) => {
+const SelectItem = ({ id, icon, text, onClick }) => {
   return (
-    <SelectDiv onClick={onClick}>
+    <SelectDiv id={id} onClick={onClick}>
       <SelectIconDiv>{icon}</SelectIconDiv>
       <SelectTextDiv>{text}</SelectTextDiv>
     </SelectDiv>
@@ -59,6 +59,7 @@ const TypeSection = ({ type, onClick }) => {
   const typeTitle = 'Type title';
   return (
     <SelectItem
+      id="type"
       onClick={onClick}
       icon={<TypeIcon fontSize="small" />}
       text={typeTitle}
@@ -70,11 +71,13 @@ const SortSection = ({ onClick }) => {
   return (
     <>
       <SelectItem
+        id="sort-asc"
         onClick={onClick}
         icon={<SortAscIcon fontSize="small" />}
         text="Sort ascending"
       />
       <SelectItem
+        id="sort-desc"
         onClick={onClick}
         icon={<SortDescIcon fontSize="small" />}
         text="Sort descending"
@@ -86,6 +89,7 @@ const SortSection = ({ onClick }) => {
 const HideSection = ({ onClick }) => {
   return (
     <SelectItem
+      id="hide"
       onClick={onClick}
       icon={<HideIcon fontSize="small" />}
       text="Hide"
@@ -97,11 +101,13 @@ const InsertColumnSection = ({ onClick }) => {
   return (
     <>
       <SelectItem
+        id="insert-left"
         onClick={onClick}
         icon={<InsertLeftIcon fontSize="small" />}
         text="Insert column left"
       />
       <SelectItem
+        id="insert-right"
         onClick={onClick}
         icon={<InsertRightIcon fontSize="small" />}
         text="Insert column right"
@@ -113,6 +119,7 @@ const InsertColumnSection = ({ onClick }) => {
 const DuplicateSection = ({ onClick }) => {
   return (
     <SelectItem
+      id="duplicate"
       onClick={onClick}
       icon={<DuplicateIcon fontSize="small" />}
       text="Duplicate"
@@ -123,6 +130,7 @@ const DuplicateSection = ({ onClick }) => {
 const DeleteSection = ({ onClick }) => {
   return (
     <SelectItem
+      id="delete"
       onClick={onClick}
       icon={<DeleteIcon fontSize="small" />}
       text="Delete"
@@ -141,13 +149,29 @@ const HeaderMenu = ({
   allowDelete,
   anchorEl,
   onClose,
-  // onMenuEvent,
+  onMenuEvent,
 }) => {
   const open = Boolean(anchorEl);
   const id = open ? `header-menu-${column.id}` : undefined;
-  // const { onChange } = onMenuEvent;
+  const { onTypeChange, onSort, onInsert, onHide, onDuplicate, onDelete } =
+    onMenuEvent;
 
-  const handleSelect = () => {
+  const handleSelect = (event) => {
+    const { id } = event.currentTarget;
+    const action = (type) => ({ type, sortBy: column.id });
+    if (id === 'type') {
+      onTypeChange(action(id));
+    } else if (['sort-asc', 'sort-desc'].includes(id)) {
+      onSort(action(id));
+    } else if (['insert-left', 'insert-right'].includes(id)) {
+      onInsert(action(id));
+    } else if (id === 'hide') {
+      onHide(action(id));
+    } else if (id === 'duplicate') {
+      onDuplicate(action(id));
+    } else if (id === 'delete') {
+      onDelete(action(id));
+    }
     onClose();
   };
 

@@ -17,6 +17,11 @@ export const createColumns = ({ menuEventHandlers }) => {
     {
       header: () => <BaseHeader title="Organization" />,
       id: 'organization',
+      custom: {
+        header: {
+          allowSort: true,
+        },
+      },
     },
     {
       header: () => <BaseHeader title="Status" />,
@@ -65,7 +70,9 @@ export default function App() {
   const columns = createColumns({ menuEventHandlers });
   const columnEventHandler = {
     onTypeChange: () => {},
-    onSort: () => {},
+    onSort: (action) => {
+      console.log(action);
+    },
     onInsert: () => {},
     onHide: () => {},
     onDuplicate: () => {},
