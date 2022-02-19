@@ -2,8 +2,10 @@ import styled from '@emotion/styled';
 
 const CellDiv = styled.div`
   display: table-cell;
+  height: 100%;
+  width: 100%;
   position: relative;
-  background: white;
+  background: none;
   border-bottom: 1px solid rgba(55, 53, 47, 0.1);
 `;
 

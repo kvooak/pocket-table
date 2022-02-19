@@ -4,11 +4,13 @@ import Cells from './Cells';
 
 const RowGroupDiv = styled.div`
   display: table-row-group;
+  height: 100%;
 `;
 
 const RowDiv = styled.div`
   display: table-row;
   width: 100%;
+  height: 100%;
 `;
 
 const Row = ({
