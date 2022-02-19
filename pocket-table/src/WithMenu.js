@@ -6,9 +6,11 @@ import MultiselectMenu from './Menus/Multiselect';
 import HeaderMenu from './Menus/HeaderMenu';
 
 const MenuAnchor = styled.div`
-  display: inline-block;
+  display: inline;
   width: 100%;
   height: 100%;
+  bottom: 0;
+  background: none;
 `;
 
 const CellMenu = React.memo(

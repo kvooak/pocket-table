@@ -65,7 +65,7 @@ export default function App() {
   };
 
 
-  const rowEventHandlers = {
+  const rowEventHandler = {
     onClick: handleOnRowClick,
     onMouseEnter: handleOnRowMouseEnter,
     onMouseLeave: handleOnRowMouseLeave,
@@ -79,7 +79,7 @@ export default function App() {
     // logic
   };
 
-  const cellEventHandlers = {
+  const cellEventHandler = {
     name: {
       onClick: () => handleOnCellClick(),
       // onMouseEnter: () => {},
@@ -95,9 +95,9 @@ export default function App() {
   return (
     <Table
       {...table}
-      rowEventHandlers={rowEventHandlers}
-      cellEventHandlers={cellEventHandlers}
-      prioritizeCellHandlers={false} // default true
+      rowEventHandler={rowEventHandler}
+      cellEventHandler={cellEventHandler}
+      prioritizeCellHandler={false} // default true
       highlightRowOnHover={false} // default true
     />
   );

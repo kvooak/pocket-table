@@ -74,16 +74,19 @@ const CellValueInput = React.memo(
         let index;
         let newValue;
         const oldValue = cellValue;
+        // block action if pressed Enter when there is no input
+        // and if pressed Backspace where there is input
         if (!input && keyPress === 'Backspace') {
           type = 'delete';
           index = cellValue.length - 1;
           newValue = cellValue.slice(0, -1);
-        } else if (keyPress === 'Enter') {
+        } else if (input && keyPress === 'Enter') {
           type = 'add';
           index = cellValue.length;
           newValue = [...cellValue, input];
         }
-        onKeyCommand({ type, value: input, index, newValue, oldValue });
+        const event = { type, value: input, index, newValue, oldValue }
+        event.type && onKeyCommand(event);
       }
     }, [keyPress, input]);
 
@@ -264,7 +267,7 @@ const MultiselectMenu = React.memo(
 
     const handleInputChange = useCallback(
       ({ input }) => setSearchKey(input),
-      [],
+      [setSearchKey],
     );
 
     return (

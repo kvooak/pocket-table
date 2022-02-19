@@ -8,6 +8,7 @@ import { BaseHeader } from '.';
 export const mapColumnsToReactTable = ({
   createColumn,
   customColumns,
+  columnEventHandler,
 }) => {
   const isEmpty = (obj) => {
     return (
@@ -46,7 +47,6 @@ export const mapColumnsToReactTable = ({
           allowHide,
           allowDuplicate,
           allowDelete,
-          menuEventHandlers: headerMenuEventHandlers,
         } = header;
 
         renderHeader = ({ column }) => (
@@ -60,7 +60,7 @@ export const mapColumnsToReactTable = ({
             allowHide={allowHide}
             allowDuplicate={allowDuplicate}
             allowDelete={allowDelete}
-            onMenuEvent={headerMenuEventHandlers}
+            onMenuEvent={columnEventHandler}
           />
         );
       }
@@ -78,12 +78,14 @@ export const createReactTable = ({
   data,
   columns: customColumns,
   defaultColumn,
+  columnEventHandler,
 }) => {
   const table = createTable();
   const { createColumn, useTable } = table;
   const columns = mapColumnsToReactTable({
     createColumn,
     customColumns,
+    columnEventHandler,
   });
   const instance = useTable({
     data,
