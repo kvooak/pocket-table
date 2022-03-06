@@ -1,4 +1,5 @@
 __tests__/
+src/
 node_modules/
 .parcel-cache/
 .babelrc

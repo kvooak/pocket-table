@@ -158,19 +158,20 @@ const HeaderMenu = ({
 
   const handleSelect = (event) => {
     const { id } = event.currentTarget;
-    const action = (type) => ({ type, sortBy: column.id });
+    const pocketEvent = { type: id, columnId: column.id };
+
     if (id === 'type') {
-      onTypeChange(action(id));
+      onTypeChange(pocketEvent);
     } else if (['sort-asc', 'sort-desc'].includes(id)) {
-      onSort(action(id));
+      onSort(pocketEvent);
     } else if (['insert-left', 'insert-right'].includes(id)) {
-      onInsert(action(id));
+      onInsert(pocketEvent);
     } else if (id === 'hide') {
-      onHide(action(id));
+      onHide(pocketEvent);
     } else if (id === 'duplicate') {
-      onDuplicate(action(id));
+      onDuplicate(pocketEvent);
     } else if (id === 'delete') {
-      onDelete(action(id));
+      onDelete(pocketEvent);
     }
     onClose();
   };

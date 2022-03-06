@@ -55,9 +55,4 @@ const Headers = ({ headers }) => {
   );
 };
 
-Headers.whyDidYouRender = {
-  logOnDifferentValues: true,
-  customName: 'Headers',
-};
-
 export default Headers;

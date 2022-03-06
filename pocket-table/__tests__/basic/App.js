@@ -70,10 +70,8 @@ export default function App() {
   const columns = createColumns({ menuEventHandlers });
   const columnEventHandler = {
     onTypeChange: () => {},
-    onSort: (action) => {
-      console.log(action);
-    },
-    onInsert: () => {},
+    onSort: () => {},
+    onInsert: (action) => {console.log(action)},
     onHide: () => {},
     onDuplicate: () => {},
     onDelete: () => {},

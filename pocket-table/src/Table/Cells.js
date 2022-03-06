@@ -49,10 +49,4 @@ const Cells = ({
   return cellsWithHandlers;
 };
 
-Cells.whyDidYouRender = {
-  logOnDifferentValues: true,
-  logOwnerReasons: true,
-  customName: 'Cells',
-};
-
 export default Cells;
