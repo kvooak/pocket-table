@@ -67,13 +67,6 @@ const Row = ({
   );
 };
 
-Row.whyDidYouRender = {
-  logOnDifferentValues: true,
-  logOwnerReasons: true,
-  customName: 'Row',
-};
-
-
 const Rows = React.memo(({
   tableBodyProps,
   rows,
@@ -95,11 +88,5 @@ const Rows = React.memo(({
     </RowGroupDiv>
   );
 });
-
-Rows.whyDidYouRender = {
-  logOnDifferentValues: true,
-  logOwnerReasons: true,
-  customName: 'Rows',
-};
 
 export default Rows;
